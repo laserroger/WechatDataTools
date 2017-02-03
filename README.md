@@ -1,6 +1,7 @@
 # WechatDataTools
 Performs some analysis with WeChat chat data
 ------
+**This program is written for iOS, it is not tested on Android since I do not own one.**
 ## Features
 
 - Statistics for all chats: see who chat with you most in total, or over a period of time.
@@ -15,8 +16,7 @@ Performs some analysis with WeChat chat data
 
 Mathematica 10.3 or above. Some functions used are newly introduced, like `Nothing` in 10.3, `UpTo` and `DateHistogram` in 10.2. You can use lower version if you can make minor changes to get it to work.
 
-**This program is written for iOS, it is not tested on Android since I do not own one.**
-**There are much easier ways to extract chat history on Android, even Windows Wechat client has such a feature.**
+## Guide
 
 The notebook includes all instructions after obtaining the app documents of Wechat. Here is a guide on obtaining those files.
 Starting from iOS 8.3, applications with file-sharing not enabled will be blocked from third party access without jailbreak, which made the process painful, but there are still methods.
