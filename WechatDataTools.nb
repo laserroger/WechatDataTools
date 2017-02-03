@@ -1,0 +1,1373 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     52071,       1365]
+NotebookOptionsPosition[     50199,       1296]
+NotebookOutlinePosition[     50557,       1312]
+CellTagsIndexPosition[     50514,       1309]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Wechat Chat History Tools", "Section",
+ CellChangeTimes->{{3.6949652908412867`*^9, 3.694965303124968*^9}, {
+  3.695136820064152*^9, 3.69513682867754*^9}}],
+
+Cell["\<\
+Version 2:
+Database format based on the newest version as of 2016 Dec
+If you receive lots of errors, it is likely that the database format has \
+changed again, since this has happened before.\
+\>", "Text",
+ CellChangeTimes->{{3.695136978072743*^9, 3.695137047175165*^9}}],
+
+Cell["\<\
+User manual: evaluate all cells in the given order, change the information \
+specified. You can ignore the comments in code.\
+\>", "Text",
+ CellChangeTimes->{{3.6951371135664454`*^9, 3.695137186696726*^9}, {
+  3.695137242691074*^9, 3.695137249637054*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Initialization code", "Subsection",
+ CellChangeTimes->{{3.6951377429425898`*^9, 3.695137748113785*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Needs", "[", "\"\<DatabaseLink`\>\"", "]"}], ";"}]], "Input"],
+
+Cell[TextData[StyleBox["Change the following paths to the two sqlite files \
+according to README",
+ FontColor->RGBColor[1, 0, 0]]], "Text",
+ CellChangeTimes->{{3.6951371996403522`*^9, 3.695137228484659*^9}, {
+  3.69513967459028*^9, 3.695139675944203*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+  "mmPath", "=", 
+   "\"\</Users/ywz/Desktop/desktop-old/App - \
+com.tencent.xin/Documents/d3a6a48811066d9529906f3cee6cf8ca/DB/MM.sqlite\>\""}]\
+, ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+  "contactPath", "=", 
+   "\"\</Users/ywz/Desktop/desktop-old/App - \
+com.tencent.xin/Documents/d3a6a48811066d9529906f3cee6cf8ca/DB/WCDB_Contact.\
+sqlite\>\""}], ";"}]}], "Input",
+ CellChangeTimes->{{3.694869150161687*^9, 3.6948691553771763`*^9}, {
+  3.694869281764926*^9, 3.694869336917783*^9}, {3.694869389796958*^9, 
+  3.6948693994104013`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"mmConn", "=", 
+   RowBox[{"OpenSQLConnection", "[", 
+    RowBox[{"JDBC", "[", 
+     RowBox[{"\"\<SQLite\>\"", ",", "mmPath"}], "]"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"contConn", "=", 
+   RowBox[{"OpenSQLConnection", "[", 
+    RowBox[{"JDBC", "[", 
+     RowBox[{"\"\<SQLite\>\"", ",", "contactPath"}], "]"}], "]"}]}], 
+  ";"}]}], "Input",
+ CellChangeTimes->{{3.69486934873288*^9, 3.694869375523746*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"rawcontact", "=", 
+    RowBox[{"SQLSelect", "[", 
+     RowBox[{"contConn", ",", "\"\<Friend\>\""}], "]"}]}], ";"}], "\n", 
+  RowBox[{"(*", 
+   RowBox[{
+   "the", " ", "function", " ", "does", " ", "not", " ", "handle", " ", 
+    "emoji", " ", "in", " ", "names", " ", "because", " ", "MMA", " ", "does",
+     " ", "not", " ", "support", " ", "it"}], "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+    "shortest", " ", "pattern", " ", "to", " ", "match", " ", "username"}], 
+    ",", " ", "nickname", ",", " ", "internalID", ",", " ", 
+    RowBox[{"has", " ", "issues"}], ",", " ", 
+    RowBox[{
+    "eats", " ", "first", " ", "letter", " ", "of", " ", "user", " ", 
+     "defined", " ", "ID", " ", "occasionally"}]}], "*)"}], 
+  RowBox[{
+   RowBox[{
+    RowBox[{"readContact", "[", 
+     RowBox[{"{", 
+      RowBox[{"username_", ",", 
+       RowBox[{"SQLBinary", "[", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"Longest", "[", "x__", "]"}], "/;", 
+           RowBox[{
+            RowBox[{"Length", "[", 
+             RowBox[{"{", "x", "}"}], "]"}], ">", "1"}]}], ",", "18", ",", 
+          "y__", ",", "26", ",", "z__", ",", "34", ",", "___"}], "}"}], "]"}],
+        ",", "profile_"}], "}"}], "]"}], ":=", 
+    RowBox[{"{", 
+     RowBox[{"username", ",", 
+      RowBox[{"Sequence", "@@", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"FromCharacterCode", "[", 
+           RowBox[{"#", ",", "\"\<UTF-8\>\""}], "]"}], "&"}], "/@", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"Drop", "[", 
+            RowBox[{
+             RowBox[{"{", "x", "}"}], ",", "2"}], "]"}], ",", 
+           RowBox[{"Drop", "[", 
+            RowBox[{
+             RowBox[{"{", "y", "}"}], ",", "1"}], "]"}], ",", 
+           RowBox[{"Drop", "[", 
+            RowBox[{
+             RowBox[{"{", "z", "}"}], ",", "1"}], "]"}]}], "}"}]}], ")"}]}], 
+      ",", 
+      RowBox[{"profile", "[", 
+       RowBox[{"[", 
+        RowBox[{"1", ",", "2"}], "]"}], "]"}]}], "}"}]}], 
+   ";"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"readContact", "[", "___", "]"}], ":=", "Nothing"}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"01", " ", "is", " ", "male"}], ",", " ", 
+    RowBox[{"02", " ", "is", " ", "female"}], ",", " ", 
+    RowBox[{"00", " ", "is", " ", "unknown"}]}], "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"contact", "=", 
+   RowBox[{
+    RowBox[{"readContact", "/@", 
+     RowBox[{"rawcontact", "[", 
+      RowBox[{"[", 
+       RowBox[{"All", ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "8", ",", "10"}], "}"}]}], "]"}], "]"}]}], "//", 
+    "Quiet"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"chatID", "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"\"\<Chat_\>\"", "<>", 
+      RowBox[{"IntegerString", "[", 
+       RowBox[{
+        RowBox[{"Hash", "[", 
+         RowBox[{"#", ",", "\"\<MD5\>\""}], "]"}], ",", "16", ",", "32"}], 
+       "]"}]}], "&"}], "/@", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{"Transpose", "[", "contact", "]"}], ")"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}]}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"getInfo", "=", 
+   RowBox[{"AssociationThread", "[", 
+    RowBox[{"chatID", ",", "contact"}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"availChatID", "=", 
+   RowBox[{"Select", "[", 
+    RowBox[{
+     RowBox[{"SQLTableNames", "[", "mmConn", "]"}], ",", 
+     RowBox[{
+      RowBox[{"StringContainsQ", "[", 
+       RowBox[{"#", ",", "\"\<Chat_\>\""}], "]"}], "&"}]}], "]"}]}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{"availUserInfo", "=", 
+   RowBox[{"Lookup", "[", 
+    RowBox[{"getInfo", ",", "availChatID"}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"chatData", "=", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"SQLSelect", "[", 
+         RowBox[{"mmConn", ",", "#"}], "]"}], "&"}], "/@", "availChatID"}], 
+      ")"}], "[", 
+     RowBox[{"[", 
+      RowBox[{"All", ",", "All", ",", 
+       RowBox[{"{", 
+        RowBox[{"4", ",", "5", ",", "9"}], "}"}]}], "]"}], "]"}]}], ";"}], 
+  "\n", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+     RowBox[{
+     "the", " ", "time", " ", "stamp", " ", "is", " ", "the", " ", "second", 
+      " ", "elapsed", " ", "from", " ", "1970"}], "-", "1", "-", 
+     RowBox[{"1", " ", "8"}]}], ":", 
+    RowBox[{"00", "AM", " ", 
+     RowBox[{"(", 
+      RowBox[{"GMT", "+", "8"}], ")"}]}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"convert", " ", "time", " ", "to", " ", "date", " ", "string"}], 
+    ",", " ", 
+    RowBox[{"for", " ", "output"}]}], "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"toDateString", "=", 
+    RowBox[{
+     RowBox[{"DateString", "@", 
+      RowBox[{"AbsoluteTime", "[", 
+       RowBox[{"2209017600", "+", "#"}], "]"}]}], "&"}]}], ";"}], "\n", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+    "convert", " ", "date", " ", "string", " ", "to", " ", "internal", " ", 
+     "time"}], ",", " ", 
+    RowBox[{"for", " ", "selection"}]}], "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"toInternalTime", "=", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"AbsoluteTime", "[", "#", "]"}], "-", "2209017600"}], "&"}]}], 
+   ";"}], "\n", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"since", " ", "order", " ", "is", " ", "preserved"}], ",", " ", 
+    RowBox[{
+    "any", " ", "other", " ", "info", " ", "than", " ", "time", " ", "is", 
+     " ", "useless", " ", "for", " ", "counting"}], ",", " ", 
+    RowBox[{"improves", " ", "performance"}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"but", " ", "to", " ", "analysis", " ", "contents"}], ",", " ", 
+    RowBox[{
+    "use", " ", "full", " ", "database", " ", "chatData", " ", "instead"}]}], 
+   "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"chatTimeStamps", "=", 
+    RowBox[{"chatData", "[", 
+     RowBox[{"[", 
+      RowBox[{"All", ",", "All", ",", "1"}], "]"}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"all", " ", "message", " ", "counts"}], "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"topAllChats", "[", "anydb_", "]"}], ":=", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Transpose", "[", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"Length", "/@", "anydb"}], ",", "availUserInfo"}], "}"}], 
+       "]"}], "//", "Sort"}], "//", "Reverse"}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"note", ":", " ", 
+    RowBox[{
+    "be", " ", "aware", " ", "of", " ", "the", " ", "precedence", " ", "of", 
+     " ", "the", " ", "Alternative", " ", "operator", " ", "in", " ", 
+     "string", " ", "patterns"}]}], "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"topAllChatsNoGroup", "[", "anydb_", "]"}], ":=", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Transpose", "[", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"Length", "/@", "anydb"}], ",", "availUserInfo"}], "}"}], 
+         "]"}], "//", "Sort"}], "//", "Reverse"}], ")"}], "/.", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"_", ",", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"_", "?", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"StringMatchQ", "[", 
+              RowBox[{"#", ",", 
+               RowBox[{
+                RowBox[{"(", 
+                 RowBox[{"__", "~~", "\"\<@chatroom\>\""}], ")"}], "|", 
+                RowBox[{"(", 
+                 RowBox[{"\"\<gh_\>\"", "~~", "__"}], ")"}]}]}], "]"}], "&"}],
+             ")"}]}], ",", "__"}], "}"}]}], "}"}], "\[RuleDelayed]", 
+      "Nothing"}]}]}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+   "performs", " ", "counting", " ", "over", " ", "a", " ", "specific", " ", 
+    "time", " ", "range"}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"function", " ", "takes", " ", "two", " ", "DateObjects"}], 
+   "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"takeTimeStampRange", "[", 
+    RowBox[{"timestampdb_", ",", "start_", ",", "end_"}], "]"}], ":=", 
+   RowBox[{"With", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"s", "=", 
+        RowBox[{"toInternalTime", "[", "start", "]"}]}], ",", 
+       RowBox[{"e", "=", 
+        RowBox[{"toInternalTime", "[", "end", "]"}]}]}], "}"}], ",", 
+     RowBox[{
+      RowBox[{"Select", "[", 
+       RowBox[{
+        RowBox[{"s", "\[LessEqual]", "#", "\[LessEqual]", "e"}], "&"}], "]"}],
+       "/@", "timestampdb"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"takeTimeRange", "[", 
+     RowBox[{"fulldb_", ",", "start_", ",", "end_"}], "]"}], ":=", 
+    RowBox[{"With", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"s", "=", 
+         RowBox[{"toInternalTime", "[", "start", "]"}]}], ",", 
+        RowBox[{"e", "=", 
+         RowBox[{"toInternalTime", "[", "end", "]"}]}]}], "}"}], ",", 
+      RowBox[{
+       RowBox[{"Select", "[", 
+        RowBox[{
+         RowBox[{"s", "\[LessEqual]", 
+          RowBox[{"#", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], "\[LessEqual]", "e"}], "&"}], 
+        "]"}], "/@", "fulldb"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"generate", " ", "a", " ", "random", " ", "time", " ", "range"}], 
+   "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"randomDateRange", "[", "timestampdb_", "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"lowerlim", ",", "upperlim"}], "}"}], ",", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"lowerlim", ",", "upperlim"}], "}"}], "=", 
+        RowBox[{"MinMax", "@", 
+         RowBox[{"Flatten", "@", "timestampdb"}]}]}], ";", 
+       RowBox[{"DateObject", "/@", 
+        RowBox[{"Sort", "@", 
+         RowBox[{"RandomInteger", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"lowerlim", ",", "upperlim"}], "}"}], "+", 
+            "2209017600"}], ",", "2"}], "]"}]}]}]}]}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+   "get", " ", "chat", " ", "data", " ", "for", " ", "a", " ", "specfic", " ",
+     "user", " ", "by", " ", "internalID"}], "*)"}]}], "\[IndentingNewLine]", 
+
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"userChat", "[", 
+     RowBox[{"fulldb_", ",", "id_String"}], "]"}], ":=", 
+    RowBox[{
+     RowBox[{
+      RowBox[{
+       RowBox[{"Position", "[", 
+        RowBox[{"availUserInfo", ",", "id"}], "]"}], "//", "Flatten"}], "//", 
+      "First"}], "//", 
+     RowBox[{
+      RowBox[{"fulldb", "[", 
+       RowBox[{"[", "#", "]"}], "]"}], "&"}]}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+   "distribution", " ", "of", " ", "messages", " ", "over", " ", "time"}], 
+   "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"toTimeSeries", "[", 
+     RowBox[{"singledb_", ",", 
+      RowBox[{"period", ":", 
+       RowBox[{"(", 
+        RowBox[{"\"\<Week\>\"", "|", "\"\<Month\>\""}], ")"}]}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"firstDay", ",", "lastDay", ",", "timedomain", ",", "counts"}],
+        "}"}], ",", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"firstDay", ",", "lastDay"}], "}"}], "=", 
+        RowBox[{"MinMax", "[", 
+         RowBox[{
+          RowBox[{"Flatten", "@", 
+           RowBox[{"singledb", "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", "1"}], "]"}], "]"}]}], "+", "2209017600"}], 
+         "]"}]}], ";", 
+       RowBox[{"timedomain", "=", 
+        RowBox[{"DateRange", "[", 
+         RowBox[{
+          RowBox[{"DateObject", "[", "firstDay", "]"}], ",", 
+          RowBox[{"DateObject", "[", "lastDay", "]"}], ",", " ", 
+          RowBox[{"{", 
+           RowBox[{"1", ",", "period"}], "}"}]}], "]"}]}], ";", 
+       RowBox[{"counts", "=", 
+        RowBox[{
+         RowBox[{"BinLists", "[", 
+          RowBox[{
+           RowBox[{"singledb", "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", "1"}], "]"}], "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"AbsoluteTime", "/@", "timedomain"}], "-", 
+             "2209017600"}], "}"}]}], "]"}], "//", 
+         RowBox[{
+          RowBox[{"Length", "/@", "#"}], "&"}]}]}], ";", 
+       RowBox[{"Transpose", "[", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"timedomain", "[", 
+           RowBox[{"[", 
+            RowBox[{";;", 
+             RowBox[{"-", "2"}]}], "]"}], "]"}], ",", "counts"}], "}"}], 
+        "]"}]}]}], "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"unfortunately", ",", " ", 
+    RowBox[{
+    "excel", " ", "format", " ", "does", " ", "not", " ", "have", " ", "that",
+      " ", "may", " ", "rows", " ", "to", " ", "store", " ", "all", " ", 
+     "chats"}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"Export", "[", 
+    RowBox[{"\"\<chat_history.xlsx\>\"", ",", 
+     RowBox[{"Thread", "[", 
+      RowBox[{
+       RowBox[{"availUserInfo", "[", 
+        RowBox[{"[", 
+         RowBox[{"All", ",", "2"}], "]"}], "]"}], "\[Rule]", "chatData"}], 
+      "]"}]}], "]"}], "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"exportAllHistory", "[", "filename_", "]"}], ":=", 
+   RowBox[{
+    RowBox[{"Export", "[", 
+     RowBox[{"filename", ",", 
+      RowBox[{"Join", "@@", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Level", "[", 
+           RowBox[{"#", ",", 
+            RowBox[{"{", 
+             RowBox[{"-", "2"}], "}"}]}], "]"}], "&"}], "/@", 
+         RowBox[{"Transpose", "[", 
+          RowBox[{"{", 
+           RowBox[{"availUserInfo", ",", 
+            RowBox[{"MapAt", "[", 
+             RowBox[{"toDateString", ",", 
+              RowBox[{"chatData", "[", 
+               RowBox[{"[", 
+                RowBox[{"All", ",", "All", ",", 
+                 RowBox[{"{", 
+                  RowBox[{"1", ",", "3", ",", "2"}], "}"}]}], "]"}], "]"}], 
+              ",", 
+              RowBox[{"{", 
+               RowBox[{"All", ",", "All", ",", "1"}], "}"}]}], "]"}]}], "}"}],
+           "]"}]}], ")"}]}]}], "]"}], "//", "AbsoluteTiming"}]}], 
+  ";"}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->{{3.694869582872785*^9, 3.694869584565522*^9}, {
+  3.6949578572322702`*^9, 3.694957865101431*^9}, {3.69495830721026*^9, 
+  3.694958307937945*^9}, {3.6951372692448473`*^9, 3.695137314984454*^9}, {
+  3.6951375713723907`*^9, 3.6951375785163*^9}, {3.6951376152480783`*^9, 
+  3.695137615535308*^9}, {3.695138785749484*^9, 3.695138789280056*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["All message counts", "Subsection",
+ CellChangeTimes->{{3.69513776490417*^9, 3.695137772724682*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"include", " ", "groups", " ", "and", " ", "subscriptions"}], ",",
+     " ", 
+    RowBox[{"first", " ", "20"}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"top20All", "=", 
+     RowBox[{
+      RowBox[{"topAllChats", "[", "chatTimeStamps", "]"}], "//", 
+      RowBox[{
+       RowBox[{"Take", "[", 
+        RowBox[{"#", ",", 
+         RowBox[{"UpTo", "[", "20", "]"}]}], "]"}], "&"}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"for", " ", "privacy", " ", "reasons"}], ",", " ", 
+     RowBox[{
+     "only", " ", "message", " ", "counts", " ", "are", " ", "displayed", " ",
+       "as", " ", "a", " ", "public", " ", 
+      RowBox[{"example", ".", " ", "But"}], " ", "the", " ", "variable", " ", 
+      "top20All", " ", "will", " ", "contain", " ", "all", " ", "infomation", 
+      " ", "in", " ", "your", " ", "run"}]}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"top20All", "[", 
+    RowBox[{"[", 
+     RowBox[{"All", ",", "1"}], "]"}], "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.695129624670095*^9, 3.695129722398445*^9}, {
+  3.695130797515345*^9, 3.695130839513812*^9}, {3.695137350915553*^9, 
+  3.695137371671303*^9}, {3.695137628723757*^9, 3.69513768392915*^9}, {
+  3.695137716921036*^9, 3.695137720586398*^9}, {3.695137798623498*^9, 
+  3.69513783271628*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "69321", ",", "28993", ",", "27602", ",", "24325", ",", "19306", ",", 
+   "18702", ",", "16936", ",", "16725", ",", "15547", ",", "13466", ",", 
+   "13341", ",", "11191", ",", "10958", ",", "10687", ",", "10084", ",", 
+   "7974", ",", "7915", ",", "5885", ",", "5634", ",", "5459"}], 
+  "}"}]], "Output",
+ CellChangeTimes->{3.695129630730577*^9, 3.695129688106657*^9, 
+  3.6951297230242233`*^9, 3.695130840358824*^9, 3.6951376844081583`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"exclude", " ", "groups", " ", "and", " ", "subscriptions"}], ",",
+     " ", 
+    RowBox[{"first", " ", "20"}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"top20", "=", 
+     RowBox[{
+      RowBox[{"topAllChatsNoGroup", "[", "chatTimeStamps", "]"}], "//", 
+      RowBox[{
+       RowBox[{"Take", "[", 
+        RowBox[{"#", ",", 
+         RowBox[{"UpTo", "[", "20", "]"}]}], "]"}], "&"}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"message", " ", "counts", " ", "only"}], "*)"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"top20", "[", 
+    RowBox[{"[", 
+     RowBox[{"All", ",", "1"}], "]"}], "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.695129726833709*^9, 3.695129737407872*^9}, {
+   3.695129817141243*^9, 3.695129817340129*^9}, {3.6951298743817673`*^9, 
+   3.6951298750451736`*^9}, {3.695130063317978*^9, 3.695130064634129*^9}, {
+   3.695130853159226*^9, 3.695130908370232*^9}, {3.695131373925045*^9, 
+   3.695131401546733*^9}, {3.695131471551511*^9, 3.695131518423498*^9}, {
+   3.6951315526410646`*^9, 3.695131554434309*^9}, 3.695137382256225*^9, {
+   3.695137689332375*^9, 3.695137702206996*^9}, {3.695137785481742*^9, 
+   3.69513779356737*^9}, {3.695138133341999*^9, 3.695138148485141*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "24325", ",", "19306", ",", "16936", ",", "16725", ",", "13466", ",", 
+   "11191", ",", "10687", ",", "7974", ",", "5459", ",", "3915", ",", "3459", 
+   ",", "2468", ",", "2317", ",", "1983", ",", "1856", ",", "1556", ",", 
+   "1485", ",", "1214", ",", "1196", ",", "1173"}], "}"}]], "Output",
+ CellChangeTimes->{
+  3.695129875378829*^9, 3.695130066939149*^9, 3.695130908750149*^9, 
+   3.695131402011862*^9, {3.6951315404975348`*^9, 3.6951315549802227`*^9}, 
+   3.695137702857897*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Message counts over a certain time range", "Subsection",
+ CellChangeTimes->{{3.695137851036769*^9, 3.69513786395257*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+   "generate", " ", "a", " ", "random", " ", "time", " ", "interval"}], 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"date1", ",", "date2"}], "}"}], "=", 
+    RowBox[{"randomDateRange", "[", "chatTimeStamps", "]"}]}], 
+   ";"}]}]], "Input",
+ CellChangeTimes->{{3.695131261729385*^9, 3.6951313097073936`*^9}, {
+  3.695137887351881*^9, 3.6951379017321453`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"in", " ", "practice"}], ",", " ", 
+    RowBox[{
+    "you", " ", "may", " ", "want", " ", "to", " ", "specify", " ", "a", " ", 
+     "time", " ", "range", " ", "manually"}], ",", " ", 
+    RowBox[{
+    "here", " ", "is", " ", "how", " ", "to", " ", "do", " ", "it"}]}], 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+     RowBox[{
+     "suppose", " ", "you", " ", "want", " ", "the", " ", "start", " ", 
+      "date", " ", 
+      RowBox[{"(", 
+       RowBox[{"date1", " ", "variable"}], ")"}], " ", "to", " ", "be", " ", 
+      "2016"}], "-", "08", "-", "17"}], ",", " ", 
+    RowBox[{"you", " ", "can", " ", "do"}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"date1", "=", 
+   RowBox[{"DateObject", "[", "\"\<2016-08-17\>\"", "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.695137918488144*^9, 3.6951379812181177`*^9}, {
+  3.695138017031464*^9, 3.6951380171753798`*^9}, {3.695138066364463*^9, 
+  3.695138092593885*^9}}],
+
+Cell[BoxData[
+ TemplateBox[{RowBox[{"\"Wed 17 Aug 2016\""}],RowBox[{"DateObject", "[", 
+     RowBox[{"{", 
+       RowBox[{"2016", ",", "8", ",", "17"}], "}"}], "]"}]},
+  "DateObject",
+  Editable->False]], "Output",
+ CellChangeTimes->{3.695138085520974*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"partialChatTimeStamp", "=", 
+   RowBox[{"takeTimeStampRange", "[", 
+    RowBox[{"chatTimeStamps", ",", "date1", ",", "date2"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"top20partial", "=", 
+    RowBox[{
+     RowBox[{"topAllChatsNoGroup", "[", "partialChatTimeStamp", "]"}], "//", 
+     RowBox[{
+      RowBox[{"Take", "[", 
+       RowBox[{"#", ",", 
+        RowBox[{"UpTo", "[", "20", "]"}]}], "]"}], "&"}]}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"message", " ", "counts", " ", "only"}], 
+   "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{"top20partial", "[", 
+  RowBox[{"[", 
+   RowBox[{"All", ",", "1"}], "]"}], "]"}]}], "Input",
+ CellChangeTimes->{{3.695130776070773*^9, 3.695130781484911*^9}, {
+   3.695130925300747*^9, 3.6951310134052773`*^9}, {3.6951313313928423`*^9, 
+   3.695131336898121*^9}, {3.69513803393381*^9, 3.695138056404091*^9}, {
+   3.6951381187798653`*^9, 3.6951381208525267`*^9}, 3.695138154405555*^9}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "9674", ",", "866", ",", "701", ",", "562", ",", "289", ",", "120", ",", 
+   "99", ",", "90", ",", "57", ",", "50", ",", "41", ",", "30", ",", "22", 
+   ",", "19", ",", "19", ",", "15", ",", "15", ",", "13", ",", "12", ",", 
+   "9"}], "}"}]], "Output",
+ CellChangeTimes->{3.69513101394696*^9, 3.69513133907854*^9, 
+  3.695131407532571*^9, 3.6951315630500717`*^9, 3.6951380583416243`*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Analysis a single person", "Subsection",
+ CellChangeTimes->{{3.695138169635913*^9, 3.695138173364002*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+    "place", " ", "the", " ", "wechat", " ", "id", " ", "you", " ", "want", 
+     " ", "to", " ", "analysis", " ", "here"}], ",", " ", 
+    RowBox[{
+     RowBox[{"it", " ", "is", " ", "of", " ", "form", " ", "wxid_XXX"}], 
+     "..."}], ",", " ", 
+    RowBox[{
+    "you", " ", "can", " ", "get", " ", "such", " ", "information", " ", "by",
+      " ", "evaluating", " ", "`availUserInfo`"}]}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"testid", "=", "\"\<wxid_XXXXXXXXXXXXXXX\>\""}], ";"}]}]], "Input",\
+
+ CellChangeTimes->{{3.6951319598685637`*^9, 3.695131966034381*^9}, 
+   3.695138219524315*^9, {3.6951382579823914`*^9, 3.6951383224495897`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+    "You", " ", "can", " ", "perform", " ", "either", " ", "a", " ", "week", 
+     " ", "or", " ", "a", " ", "month", " ", "summation"}], ",", " ", 
+    RowBox[{"by", " ", "altering", " ", "that", " ", 
+     RowBox[{"\"\<Week\>\"", "/", "\"\<Month\>\""}]}]}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"in", " ", "this", " ", "picture"}], ",", " ", 
+    RowBox[{"every", " ", "datapoint", 
+     RowBox[{"(", 
+      RowBox[{"although", " ", "they", " ", "are", " ", "connected"}], ")"}], 
+     " ", "is", " ", "a", " ", "summation", " ", "of", " ", "week"}], ",", 
+    " ", 
+    RowBox[{
+    "the", " ", "connection", " ", "only", " ", "shows", " ", "the", " ", 
+     "trend"}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"DateListPlot", "[", 
+   RowBox[{
+    RowBox[{"toTimeSeries", "[", 
+     RowBox[{
+      RowBox[{"userChat", "[", 
+       RowBox[{"chatData", ",", "testid"}], "]"}], ",", "\"\<Week\>\""}], 
+     "]"}], ",", 
+    RowBox[{"PlotRange", "\[Rule]", "All"}], ",", 
+    RowBox[{"DateTicksFormat", "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{
+      "\"\<Month\>\"", ",", " ", "\"\</\>\"", ",", " ", "\"\<YearShort\>\""}],
+       "}"}]}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.6951339103004093`*^9, 3.695133920255316*^9}, {
+   3.695138217825488*^9, 3.695138224989408*^9}, {3.6951383287190437`*^9, 
+   3.6951384018980913`*^9}, {3.695138537513295*^9, 3.695138538297524*^9}, {
+   3.695138572739946*^9, 3.6951385778298903`*^9}, {3.695138611226177*^9, 
+   3.695138615828775*^9}, 3.695138776464408*^9, {3.695139021873262*^9, 
+   3.695139033466921*^9}, {3.695139070406526*^9, 3.695139172034671*^9}, {
+   3.6951396255344553`*^9, 3.695139626416439*^9}}],
+
+Cell[BoxData[
+ GraphicsBox[{{}, {{}, {}, 
+    {RGBColor[0.368417, 0.506779, 0.709798], PointSize[0.009166666666666668], 
+     AbsoluteThickness[1.6], LineBox[CompressedData["
+1:eJxVlMlPU1EUh59o6swYK2pUQChIHDDQUsShihYs8+BjxlKkqYJ2gmqMUSNY
+wD8ARxJXjXFEF10qTt07Vd2xeiq4cEVUEOQe7i/xLJr2y7n33POdc3tTHe6a
+zhhFUbrmP+JbUcb1T6cnDtBPJdkyz84vM2CKh5VZxrqsOcZqpTL5P4cCixhP
+jcSAG0R+65vFLD78Ywk4W8S1JB04V7CpcClbH3QsYxwdWg42iPWGJytYPPB5
+JePI3CrG+sxYxs6KOMbh3njGupEEyXfaxXnq60TJY3bBockkrDcJnkpcA84j
+/9167t++lrE2mMzYNLqO+39az/1nNzA2GDZy//JN3L9nM/e/nQKuEPU5X6VK
+vlQlODyRBrYK1iWms/1qQYbkcQf52w3oRzP5D2Qi7iT/x1mS7R2Ch6NbsZ7u
+h/Y3G/0NCDZlbMP+AcHBsu2Sf/YIjvp3YP9pwYZbO1Fvq+DAyxzkOyc48n2X
+ZHOfYH1CruTRs+RvzsN6mmf4mBG+LeQ/YJL866pg9VG+5IYg+X80I9958p8p
+AHvJP71Qcryf/Ev3SPZQPs23F/05Q/4390nO8ZD/i/3wpXqj3yyor4j84w8i
+3kT++UWSUy6Tf9sh9NNN/sHD6Fc1+T+0Iu4i/w/Fki115D9TgvhF8t9iw/k0
+35CtFPU7yN9bxv4f1hvlyFdP/mMVkqsukP/XSsmufvKPq0b9VG/QVMPmFW2t
+Rf8Hyf9KneS7xIEHR3E+9TvyXsV+6q9+uh7+3eSf1oj6aN7hI03sfdJ5m8Ft
+5H+9Bb6d5P+8FflU8tfaMO+F+cfaEad+DhvbwT7yb3Hw+9/fgfOKyf/+cTDV
+H33XCbaR/x8nm2cg1cXuR6TkBPxqyd9zkt1357Uu9IvqCz/r5u+fdgr76f+l
+rnYjTu9DKM8DNpJ/s5e9H9Y+H3hh/vf87HztbQ/ijeT/uxf1uCz/AMZYuz4=
+
+      "]]}}, {}, {}, {{}, {}}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{False, False},
+  AxesLabel->{None, None},
+  AxesOrigin->{3.621621943*^9, 0},
+  DisplayFunction->Identity,
+  Frame->{{True, True}, {True, True}},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->
+   FrontEndValueCache[{{Automatic, Automatic}, {Charting`FindScaledTicks[
+       (Charting`getDateTicks[Automatic, {"Month", "/", "YearShort"}, 
+        (Map[DateList, {
+          SlotSequence[1]}]& )[
+         SlotSequence[1]], None, 5, {{0.0125, 0}, {0.0075, 0}}, Automatic]& )[
+       
+        SlotSequence[1]], {Identity, Identity}]& , Charting`ScaledFrameTicks[
+       (Charting`getDateTicks[
+       Charting`getDateTicks[Automatic, {"Month", "/", "YearShort"}, 
+         (Map[DateList, {
+           SlotSequence[1]}]& )[
+          SlotSequence[1]], None, 5, {{0.0125, 0}, {0.0075, 0}}, 
+         Automatic]& , {"Month", "/", "YearShort"}, 
+        (Map[DateList, {
+          SlotSequence[1]}]& )[
+         SlotSequence[1]], None, 5, {{0.0125, 0}, {0.0075, 0}}, None]& )[
+        SlotSequence[1]], {Identity, Identity}]& }}, {{
+     Automatic, Automatic}, {{{3.6131616*^9, 
+        FormBox["\"07/14\"", TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6290592*^9, 
+        FormBox["\"01/15\"", TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6446976*^9, 
+        FormBox["\"07/15\"", TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6605952*^9, 
+        FormBox["\"01/16\"", TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.67632*^9, 
+        FormBox["\"07/16\"", TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6922176*^9, 
+        FormBox["\"01/17\"", TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6185184*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6237888*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6341568*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6394272*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6500544*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6553248*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6657792*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6710496*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6816768*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6869472*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 
+        0.}}}, {{3.6131616*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6290592*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6446976*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6605952*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.67632*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6922176*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6185184*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6237888*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6341568*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6394272*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6500544*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6553248*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6657792*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6710496*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6816768*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}, {
+       3.6869472*^9, 
+        FormBox[
+         InterpretationBox[
+          StyleBox[
+           
+           GraphicsBox[{}, ImageSize -> {0., 0.}, BaselinePosition -> 
+            Baseline], "CacheGraphics" -> False], 
+          Spacer[{0., 0.}]], TraditionalForm], {0.008333333333333333, 0.}}}}}],
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  ImagePadding->All,
+  Method->{"CoordinatesToolOptions" -> {"DisplayFunction" -> ({
+        (Part[{{Identity, Identity}, {Identity, Identity}}, 1, 2][#]& )[
+         Part[#, 1]], 
+        (Part[{{Identity, Identity}, {Identity, Identity}}, 2, 2][#]& )[
+         Part[#, 2]]}& ), "CopiedValueFunction" -> ({
+        (Part[{{Identity, Identity}, {Identity, Identity}}, 1, 2][#]& )[
+         Part[#, 1]], 
+        (Part[{{Identity, Identity}, {Identity, Identity}}, 2, 2][#]& )[
+         Part[#, 2]]}& )}},
+  PlotRange->{{3.621621943*^9, 3.685730743*^9}, {0, 863.}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.02], 
+     Scaled[0.05]}},
+  Ticks->{{}, Automatic}]], "Output",
+ CellChangeTimes->{3.695138578295636*^9, 3.6951386169896593`*^9, 
+  3.695139034542306*^9, 3.695139076795433*^9, 3.695139126113159*^9, 
+  3.69513917429272*^9, 3.695139627090625*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+    "if", " ", "you", " ", "are", " ", "not", " ", "comfortable", " ", "with",
+      " ", "the", " ", "plot", " ", "above"}], ",", " ", 
+    RowBox[{"here", " ", "is", " ", "another", " ", "option"}]}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"DateHistogram", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{
+      RowBox[{"userChat", "[", 
+       RowBox[{"chatData", ",", "testid"}], "]"}], "[", 
+      RowBox[{"[", 
+       RowBox[{"All", ",", "1"}], "]"}], "]"}], "+", "2209017600"}], ",", 
+    "\"\<Week\>\""}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.695139176450635*^9, 3.6951392028339148`*^9}}],
+
+Cell[BoxData[
+ GraphicsBox[{
+   {RGBColor[0.987148, 0.8073604000000001, 0.49470040000000004`], EdgeForm[
+    Opacity[0.]], {}, 
+    {RGBColor[0.987148, 0.8073604000000001, 0.49470040000000004`], EdgeForm[
+     Opacity[0.]], RectangleBox[{3.6215424*^9, 0}, {3.6221472*^9, 6},
+      RoundingRadius->0], RectangleBox[{3.6251712*^9, 0}, {3.625776*^9, 96},
+      RoundingRadius->0], RectangleBox[{3.6263808*^9, 0}, {3.6269856*^9, 13},
+      RoundingRadius->0], RectangleBox[{3.6269856*^9, 0}, {3.6275904*^9, 19},
+      RoundingRadius->0], RectangleBox[{3.6288*^9, 0}, {3.6294048*^9, 11},
+      RoundingRadius->0], 
+     RectangleBox[{3.6330336*^9, 0}, {3.6336384*^9, 141},
+      RoundingRadius->0], 
+     RectangleBox[{3.6336384*^9, 0}, {3.6342432*^9, 134},
+      RoundingRadius->0], RectangleBox[{3.6342432*^9, 0}, {3.634848*^9, 22},
+      RoundingRadius->0], RectangleBox[{3.634848*^9, 0}, {3.6354528*^9, 20},
+      RoundingRadius->0], RectangleBox[{3.640896*^9, 0}, {3.6415008*^9, 60},
+      RoundingRadius->0], RectangleBox[{3.6415008*^9, 0}, {3.6421056*^9, 66},
+      RoundingRadius->0], RectangleBox[{3.6421056*^9, 0}, {3.6427104*^9, 45},
+      RoundingRadius->0], RectangleBox[{3.6433152*^9, 0}, {3.64392*^9, 151},
+      RoundingRadius->0], RectangleBox[{3.64392*^9, 0}, {3.6445248*^9, 111},
+      RoundingRadius->0], 
+     RectangleBox[{3.6445248*^9, 0}, {3.6451296*^9, 152},
+      RoundingRadius->0], 
+     RectangleBox[{3.6451296*^9, 0}, {3.6457344*^9, 186},
+      RoundingRadius->0], RectangleBox[{3.6457344*^9, 0}, {3.6463392*^9, 99},
+      RoundingRadius->0], RectangleBox[{3.6463392*^9, 0}, {3.646944*^9, 282},
+      RoundingRadius->0], RectangleBox[{3.646944*^9, 0}, {3.6475488*^9, 781},
+      RoundingRadius->0], 
+     RectangleBox[{3.6475488*^9, 0}, {3.6481536*^9, 398},
+      RoundingRadius->0], 
+     RectangleBox[{3.6481536*^9, 0}, {3.6487584*^9, 229},
+      RoundingRadius->0], 
+     RectangleBox[{3.6487584*^9, 0}, {3.6493632*^9, 117},
+      RoundingRadius->0], RectangleBox[{3.6493632*^9, 0}, {3.649968*^9, 331},
+      RoundingRadius->0], RectangleBox[{3.649968*^9, 0}, {3.6505728*^9, 585},
+      RoundingRadius->0], 
+     RectangleBox[{3.6505728*^9, 0}, {3.6511776*^9, 499},
+      RoundingRadius->0], 
+     RectangleBox[{3.6511776*^9, 0}, {3.6517824*^9, 172},
+      RoundingRadius->0], 
+     RectangleBox[{3.6517824*^9, 0}, {3.6523872*^9, 105},
+      RoundingRadius->0], RectangleBox[{3.6523872*^9, 0}, {3.652992*^9, 645},
+      RoundingRadius->0], RectangleBox[{3.652992*^9, 0}, {3.6535968*^9, 901},
+      RoundingRadius->0], 
+     RectangleBox[{3.6535968*^9, 0}, {3.6542016*^9, 423},
+      RoundingRadius->0], 
+     RectangleBox[{3.6542016*^9, 0}, {3.6548064*^9, 334},
+      RoundingRadius->0], 
+     RectangleBox[{3.6548064*^9, 0}, {3.6554112*^9, 298},
+      RoundingRadius->0], RectangleBox[{3.6554112*^9, 0}, {3.656016*^9, 863},
+      RoundingRadius->0], RectangleBox[{3.656016*^9, 0}, {3.6566208*^9, 373},
+      RoundingRadius->0], 
+     RectangleBox[{3.6566208*^9, 0}, {3.6572256*^9, 246},
+      RoundingRadius->0], 
+     RectangleBox[{3.6572256*^9, 0}, {3.6578304*^9, 348},
+      RoundingRadius->0], RectangleBox[{3.6578304*^9, 0}, {3.6584352*^9, 90},
+      RoundingRadius->0], RectangleBox[{3.6584352*^9, 0}, {3.65904*^9, 60},
+      RoundingRadius->0], RectangleBox[{3.65904*^9, 0}, {3.6596448*^9, 651},
+      RoundingRadius->0], 
+     RectangleBox[{3.6596448*^9, 0}, {3.6602496*^9, 255},
+      RoundingRadius->0], RectangleBox[{3.6602496*^9, 0}, {3.6608544*^9, 68},
+      RoundingRadius->0], 
+     RectangleBox[{3.6608544*^9, 0}, {3.6614592*^9, 181},
+      RoundingRadius->0], RectangleBox[{3.6614592*^9, 0}, {3.662064*^9, 98},
+      RoundingRadius->0], RectangleBox[{3.662064*^9, 0}, {3.6626688*^9, 417},
+      RoundingRadius->0], 
+     RectangleBox[{3.6626688*^9, 0}, {3.6632736*^9, 269},
+      RoundingRadius->0], 
+     RectangleBox[{3.6632736*^9, 0}, {3.6638784*^9, 104},
+      RoundingRadius->0], 
+     RectangleBox[{3.6638784*^9, 0}, {3.6644832*^9, 180},
+      RoundingRadius->0], RectangleBox[{3.6644832*^9, 0}, {3.665088*^9, 86},
+      RoundingRadius->0], RectangleBox[{3.665088*^9, 0}, {3.6656928*^9, 485},
+      RoundingRadius->0], 
+     RectangleBox[{3.6656928*^9, 0}, {3.6662976*^9, 590},
+      RoundingRadius->0], 
+     RectangleBox[{3.6662976*^9, 0}, {3.6669024*^9, 243},
+      RoundingRadius->0], 
+     RectangleBox[{3.6669024*^9, 0}, {3.6675072*^9, 455},
+      RoundingRadius->0], RectangleBox[{3.6675072*^9, 0}, {3.668112*^9, 597},
+      RoundingRadius->0], RectangleBox[{3.668112*^9, 0}, {3.6687168*^9, 952},
+      RoundingRadius->0], 
+     RectangleBox[{3.6687168*^9, 0}, {3.6693216*^9, 235},
+      RoundingRadius->0], 
+     RectangleBox[{3.6693216*^9, 0}, {3.6699264*^9, 468},
+      RoundingRadius->0], 
+     RectangleBox[{3.6699264*^9, 0}, {3.6705312*^9, 241},
+      RoundingRadius->0], RectangleBox[{3.6705312*^9, 0}, {3.671136*^9, 64},
+      RoundingRadius->0], RectangleBox[{3.671136*^9, 0}, {3.6717408*^9, 76},
+      RoundingRadius->0], RectangleBox[{3.6717408*^9, 0}, {3.6723456*^9, 39},
+      RoundingRadius->0], 
+     RectangleBox[{3.6723456*^9, 0}, {3.6729504*^9, 252},
+      RoundingRadius->0], RectangleBox[{3.6729504*^9, 0}, {3.6735552*^9, 90},
+      RoundingRadius->0], RectangleBox[{3.6735552*^9, 0}, {3.67416*^9, 218},
+      RoundingRadius->0], RectangleBox[{3.67416*^9, 0}, {3.6747648*^9, 115},
+      RoundingRadius->0], 
+     RectangleBox[{3.6747648*^9, 0}, {3.6753696*^9, 318},
+      RoundingRadius->0], 
+     RectangleBox[{3.6753696*^9, 0}, {3.6759744*^9, 312},
+      RoundingRadius->0], RectangleBox[{3.6759744*^9, 0}, {3.6765792*^9, 96},
+      RoundingRadius->0], RectangleBox[{3.6765792*^9, 0}, {3.677184*^9, 277},
+      RoundingRadius->0], RectangleBox[{3.677184*^9, 0}, {3.6777888*^9, 143},
+      RoundingRadius->0], RectangleBox[{3.6777888*^9, 0}, {3.6783936*^9, 63},
+      RoundingRadius->0], RectangleBox[{3.6783936*^9, 0}, {3.6789984*^9, 41},
+      RoundingRadius->0], RectangleBox[{3.6789984*^9, 0}, {3.6796032*^9, 79},
+      RoundingRadius->0], RectangleBox[{3.6796032*^9, 0}, {3.680208*^9, 118},
+      RoundingRadius->0], RectangleBox[{3.680208*^9, 0}, {3.6808128*^9, 100},
+      RoundingRadius->0], 
+     RectangleBox[{3.6814176*^9, 0}, {3.6820224*^9, 117},
+      RoundingRadius->0], RectangleBox[{3.6820224*^9, 0}, {3.6826272*^9, 44},
+      RoundingRadius->0], RectangleBox[{3.6826272*^9, 0}, {3.683232*^9, 21},
+      RoundingRadius->0], 
+     RectangleBox[{3.6838368*^9, 0}, {3.6844416*^9, 139},
+      RoundingRadius->0], 
+     RectangleBox[{3.6844416*^9, 0}, {3.6850464*^9, 129},
+      RoundingRadius->0], 
+     RectangleBox[{3.6850464*^9, 0}, {3.6856512*^9, 106},
+      RoundingRadius->0], RectangleBox[{3.6856512*^9, 0}, {3.686256*^9, 185},
+      RoundingRadius->0], RectangleBox[{3.686256*^9, 0}, {3.6868608*^9, 177},
+      RoundingRadius->
+       0]}, {}, {}}, {{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, \
+{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, \
+{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, \
+{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, \
+{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{True, True},
+  AxesLabel->{None, None},
+  AxesOrigin->{3.620236032*^9, 0},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {{{3.6215424*^9, 
+       FormBox["\"10/6/14\"", TraditionalForm], {0, 0.01}}, {3.6324288*^9, 
+       FormBox["\"2/9/15\"", TraditionalForm], {0, 0.01}}, {3.6433152*^9, 
+       FormBox["\"6/15/15\"", TraditionalForm], {0, 0.01}}, {3.6542016*^9, 
+       FormBox["\"10/19/15\"", TraditionalForm], {0, 0.01}}, {3.665088*^9, 
+       FormBox["\"2/22/16\"", TraditionalForm], {0, 0.01}}, {3.6759744*^9, 
+       FormBox["\"6/27/16\"", TraditionalForm], {0, 0.01}}, {3.6868608*^9, 
+       FormBox["\"10/31/16\"", TraditionalForm], {0, 0.01}}}, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  PlotRange->{{3.6215424*^9, 3.6868608*^9}, {All, All}},
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.02], 
+     Scaled[0.05]}},
+  Ticks->{{{3.6215424*^9, 
+      FormBox["\"10/6/14\"", TraditionalForm], {0, 0.01}}, {3.6324288*^9, 
+      FormBox["\"2/9/15\"", TraditionalForm], {0, 0.01}}, {3.6433152*^9, 
+      FormBox["\"6/15/15\"", TraditionalForm], {0, 0.01}}, {3.6542016*^9, 
+      FormBox["\"10/19/15\"", TraditionalForm], {0, 0.01}}, {3.665088*^9, 
+      FormBox["\"2/22/16\"", TraditionalForm], {0, 0.01}}, {3.6759744*^9, 
+      FormBox["\"6/27/16\"", TraditionalForm], {0, 0.01}}, {3.6868608*^9, 
+      FormBox["\"10/31/16\"", TraditionalForm], {0, 0.01}}}, 
+    Automatic}]], "Output",
+ CellChangeTimes->{3.695139205839775*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Export All Chat History as CSV", "Subsection",
+ CellChangeTimes->{{3.695139217451602*^9, 3.695139225206373*^9}}],
+
+Cell["\<\
+The file will be placed in your working directory if not specified.
+Each line of chat data is of form: date string, sender(0 is yourself, 1 is \
+the other, automatic specify person in groups), contents.
+Different people/groups are separated by a line of user identity, it is of \
+form: internal ID, name, user ID(if available), nickname(if available), gender.
+Please note that exporting can take minutes if the database is large. And \
+opening the CSV file with a professional text editor is strongly recommended, \
+it can crash some editors that can\[CloseCurlyQuote]t handle big files.\
+\>", "Text",
+ CellChangeTimes->{{3.695139293288022*^9, 3.695139594379627*^9}, 
+   3.695139768322069*^9}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"exportAllHistory", "[", "\"\<history.csv\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.69513924679941*^9, 3.6951392548560123`*^9}, 
+   3.695139384252905*^9}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"106.129271`", ",", "\<\"history.csv\"\>"}], "}"}]], "Output",
+ CellChangeTimes->{3.6951393637328987`*^9, 3.6951394912133293`*^9}]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{1436, 855},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"11.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (September \
+21, 2016)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 160, 2, 95, "Section"],
+Cell[743, 26, 281, 6, 105, "Text"],
+Cell[1027, 34, 265, 5, 46, "Text"],
+Cell[CellGroupData[{
+Cell[1317, 43, 109, 1, 65, "Subsection"],
+Cell[1429, 46, 96, 2, 48, "Input"],
+Cell[1528, 50, 255, 4, 46, "Text"],
+Cell[1786, 56, 582, 15, 204, "Input"],
+Cell[2371, 73, 469, 13, 80, "Input"],
+Cell[2843, 88, 14832, 426, 1787, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[17712, 519, 105, 1, 65, "Subsection"],
+Cell[CellGroupData[{
+Cell[17842, 524, 1394, 33, 173, "Input"],
+Cell[19239, 559, 483, 9, 80, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[19759, 573, 1308, 30, 142, "Input"],
+Cell[21070, 605, 526, 10, 80, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21645, 621, 127, 1, 65, "Subsection"],
+Cell[21775, 624, 457, 13, 80, "Input"],
+Cell[CellGroupData[{
+Cell[22257, 641, 1012, 25, 111, "Input"],
+Cell[23272, 668, 256, 6, 61, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23565, 679, 1015, 25, 142, "Input"],
+Cell[24583, 706, 429, 8, 48, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[25061, 720, 112, 1, 65, "Subsection"],
+Cell[25176, 723, 729, 18, 111, "Input"],
+Cell[CellGroupData[{
+Cell[25930, 745, 1762, 40, 173, "Input"],
+Cell[27695, 787, 11690, 290, 364, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[39422, 1082, 668, 18, 80, "Input"],
+Cell[40093, 1102, 8816, 157, 349, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[48958, 1265, 118, 1, 65, "Subsection"],
+Cell[49079, 1268, 703, 11, 194, "Text"],
+Cell[CellGroupData[{
+Cell[49807, 1283, 180, 3, 48, "Input"],
+Cell[49990, 1288, 169, 3, 48, "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
