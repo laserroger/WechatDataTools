@@ -11,6 +11,9 @@ Performs some analysis with WeChat chat data
 
 - If you can understand the code, it is easy write other functions to discover more from your chat history, for example, semantics analysis, etc. I don't have that much extra time to implement more.
 
+## Requirements
+
+Mathematica 10.3 or above. Some functions used are newly introduced, like `Nothing` in 10.3, `UpTo` and `DateHistogram` in 10.2. You can use lower version if you can make minor changes to get it to work.
 
 **This program is written for iOS, it is not tested on Android since I do not own one.**
 **There are much easier ways to extract chat history on Android, even Windows Wechat client has such a feature.**
