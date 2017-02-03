@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     52071,       1365]
-NotebookOptionsPosition[     50199,       1296]
-NotebookOutlinePosition[     50557,       1312]
-CellTagsIndexPosition[     50514,       1309]
+NotebookDataLength[     51995,       1366]
+NotebookOptionsPosition[     50198,       1299]
+NotebookOutlinePosition[     50556,       1315]
+CellTagsIndexPosition[     50513,       1312]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -46,7 +46,18 @@ Cell["Initialization code", "Subsection",
 
 Cell[BoxData[
  RowBox[{
-  RowBox[{"Needs", "[", "\"\<DatabaseLink`\>\"", "]"}], ";"}]], "Input"],
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"don", "'"}], "t", " ", "forget", " ", "to", " ", "evaluate", 
+     " ", "this", " ", "line"}], ",", " ", 
+    RowBox[{
+    "I", " ", "will", " ", "not", " ", "set", " ", "an", " ", 
+     "initialization", " ", "cell", " ", "to", " ", "confuse", " ", "you"}]}],
+    "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"Needs", "[", "\"\<DatabaseLink`\>\"", "]"}], ";"}]}]], "Input",
+ CellChangeTimes->{{3.695141687633045*^9, 3.695141722793374*^9}}],
 
 Cell[TextData[StyleBox["Change the following paths to the two sqlite files \
 according to README",
@@ -66,12 +77,7 @@ com.tencent.xin/Documents/d3a6a48811066d9529906f3cee6cf8ca/DB/MM.sqlite\>\""}]\
   "contactPath", "=", 
    "\"\</Users/ywz/Desktop/desktop-old/App - \
 com.tencent.xin/Documents/d3a6a48811066d9529906f3cee6cf8ca/DB/WCDB_Contact.\
-sqlite\>\""}], ";"}]}], "Input",
- CellChangeTimes->{{3.694869150161687*^9, 3.6948691553771763`*^9}, {
-  3.694869281764926*^9, 3.694869336917783*^9}, {3.694869389796958*^9, 
-  3.6948693994104013`*^9}}],
-
-Cell[BoxData[{
+sqlite\>\""}], ";"}], "\n", 
  RowBox[{
   RowBox[{"mmConn", "=", 
    RowBox[{"OpenSQLConnection", "[", 
@@ -83,10 +89,7 @@ Cell[BoxData[{
    RowBox[{"OpenSQLConnection", "[", 
     RowBox[{"JDBC", "[", 
      RowBox[{"\"\<SQLite\>\"", ",", "contactPath"}], "]"}], "]"}]}], 
-  ";"}]}], "Input",
- CellChangeTimes->{{3.69486934873288*^9, 3.694869375523746*^9}}],
-
-Cell[BoxData[{
+  ";"}], "\n", 
  RowBox[{
   RowBox[{
    RowBox[{"rawcontact", "=", 
@@ -149,13 +152,14 @@ Cell[BoxData[{
  RowBox[{
   RowBox[{
    RowBox[{
-    RowBox[{"readContact", "[", "___", "]"}], ":=", "Nothing"}], ";"}], 
-  "\[IndentingNewLine]", 
+    RowBox[{"readContact", "[", "___", "]"}], ":=", "Nothing"}], ";"}], "\n", 
+  
   RowBox[{"(*", 
    RowBox[{
     RowBox[{"01", " ", "is", " ", "male"}], ",", " ", 
     RowBox[{"02", " ", "is", " ", "female"}], ",", " ", 
-    RowBox[{"00", " ", "is", " ", "unknown"}]}], "*)"}]}], "\n", 
+    RowBox[{"00", " ", "is", " ", "unknown"}]}], 
+   "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"contact", "=", 
    RowBox[{
@@ -233,13 +237,14 @@ Cell[BoxData[{
     RowBox[{
      RowBox[{"DateString", "@", 
       RowBox[{"AbsoluteTime", "[", 
-       RowBox[{"2209017600", "+", "#"}], "]"}]}], "&"}]}], ";"}], "\n", 
+       RowBox[{"2209017600", "+", "#"}], "]"}]}], "&"}]}], ";"}], 
+  "\[IndentingNewLine]", 
   RowBox[{"(*", 
    RowBox[{
     RowBox[{
     "convert", " ", "date", " ", "string", " ", "to", " ", "internal", " ", 
      "time"}], ",", " ", 
-    RowBox[{"for", " ", "selection"}]}], "*)"}]}], "\[IndentingNewLine]", 
+    RowBox[{"for", " ", "selection"}]}], "*)"}]}], "\n", 
  RowBox[{
   RowBox[{
    RowBox[{"toInternalTime", "=", 
@@ -265,10 +270,10 @@ Cell[BoxData[{
    RowBox[{"chatTimeStamps", "=", 
     RowBox[{"chatData", "[", 
      RowBox[{"[", 
-      RowBox[{"All", ",", "All", ",", "1"}], "]"}], "]"}]}], ";"}], 
-  "\[IndentingNewLine]", 
+      RowBox[{"All", ",", "All", ",", "1"}], "]"}], "]"}]}], ";"}], "\n", 
   RowBox[{"(*", 
-   RowBox[{"all", " ", "message", " ", "counts"}], "*)"}]}], "\n", 
+   RowBox[{"all", " ", "message", " ", "counts"}], 
+   "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
    RowBox[{
@@ -508,11 +513,9 @@ Cell[BoxData[{
                RowBox[{"All", ",", "All", ",", "1"}], "}"}]}], "]"}]}], "}"}],
            "]"}]}], ")"}]}]}], "]"}], "//", "AbsoluteTiming"}]}], 
   ";"}], "\[IndentingNewLine]"}], "Input",
- CellChangeTimes->{{3.694869582872785*^9, 3.694869584565522*^9}, {
-  3.6949578572322702`*^9, 3.694957865101431*^9}, {3.69495830721026*^9, 
-  3.694958307937945*^9}, {3.6951372692448473`*^9, 3.695137314984454*^9}, {
-  3.6951375713723907`*^9, 3.6951375785163*^9}, {3.6951376152480783`*^9, 
-  3.695137615535308*^9}, {3.695138785749484*^9, 3.695138789280056*^9}}]
+ CellChangeTimes->{{3.694869150161687*^9, 3.6948691553771763`*^9}, {
+   3.694869281764926*^9, 3.694869336917783*^9}, {3.694869389796958*^9, 
+   3.6948693994104013`*^9}, 3.695141746255883*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -1317,53 +1320,51 @@ Cell[743, 26, 281, 6, 105, "Text"],
 Cell[1027, 34, 265, 5, 46, "Text"],
 Cell[CellGroupData[{
 Cell[1317, 43, 109, 1, 65, "Subsection"],
-Cell[1429, 46, 96, 2, 48, "Input"],
-Cell[1528, 50, 255, 4, 46, "Text"],
-Cell[1786, 56, 582, 15, 204, "Input"],
-Cell[2371, 73, 469, 13, 80, "Input"],
-Cell[2843, 88, 14832, 426, 1787, "Input"]
+Cell[1429, 46, 529, 13, 80, "Input"],
+Cell[1961, 61, 255, 4, 46, "Text"],
+Cell[2219, 67, 15455, 450, 2035, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[17712, 519, 105, 1, 65, "Subsection"],
+Cell[17711, 522, 105, 1, 65, "Subsection"],
 Cell[CellGroupData[{
-Cell[17842, 524, 1394, 33, 173, "Input"],
-Cell[19239, 559, 483, 9, 80, "Output"]
+Cell[17841, 527, 1394, 33, 173, "Input"],
+Cell[19238, 562, 483, 9, 80, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[19759, 573, 1308, 30, 142, "Input"],
-Cell[21070, 605, 526, 10, 80, "Output"]
+Cell[19758, 576, 1308, 30, 142, "Input"],
+Cell[21069, 608, 526, 10, 80, "Output"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[21645, 621, 127, 1, 65, "Subsection"],
-Cell[21775, 624, 457, 13, 80, "Input"],
+Cell[21644, 624, 127, 1, 65, "Subsection"],
+Cell[21774, 627, 457, 13, 80, "Input"],
 Cell[CellGroupData[{
-Cell[22257, 641, 1012, 25, 111, "Input"],
-Cell[23272, 668, 256, 6, 61, "Output"]
+Cell[22256, 644, 1012, 25, 111, "Input"],
+Cell[23271, 671, 256, 6, 61, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[23565, 679, 1015, 25, 142, "Input"],
-Cell[24583, 706, 429, 8, 48, "Output"]
+Cell[23564, 682, 1015, 25, 142, "Input"],
+Cell[24582, 709, 429, 8, 48, "Output"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[25061, 720, 112, 1, 65, "Subsection"],
-Cell[25176, 723, 729, 18, 111, "Input"],
+Cell[25060, 723, 112, 1, 65, "Subsection"],
+Cell[25175, 726, 729, 18, 111, "Input"],
 Cell[CellGroupData[{
-Cell[25930, 745, 1762, 40, 173, "Input"],
-Cell[27695, 787, 11690, 290, 364, "Output"]
+Cell[25929, 748, 1762, 40, 173, "Input"],
+Cell[27694, 790, 11690, 290, 364, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[39422, 1082, 668, 18, 80, "Input"],
-Cell[40093, 1102, 8816, 157, 349, "Output"]
+Cell[39421, 1085, 668, 18, 80, "Input"],
+Cell[40092, 1105, 8816, 157, 349, "Output"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[48958, 1265, 118, 1, 65, "Subsection"],
-Cell[49079, 1268, 703, 11, 194, "Text"],
+Cell[48957, 1268, 118, 1, 65, "Subsection"],
+Cell[49078, 1271, 703, 11, 194, "Text"],
 Cell[CellGroupData[{
-Cell[49807, 1283, 180, 3, 48, "Input"],
-Cell[49990, 1288, 169, 3, 48, "Output"]
+Cell[49806, 1286, 180, 3, 48, "Input"],
+Cell[49989, 1291, 169, 3, 48, "Output"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
