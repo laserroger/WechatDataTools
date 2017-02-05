@@ -4,9 +4,9 @@ Performs some analysis with WeChat chat data
 **This program is written for iOS, it is not tested on Android since I do not own one.**
 ## Features
 
-- Statistics for all chats: see who chat with you most in total, or over a period of time.
+- Statistics for all chats: message counts rankings in total, or over a period of time.
 
-- Statistics for one person: see the change of frequency of your conversations.
+- Statistics for one person: histogram of message counts, with customisable bin size.
 
 - Export all chat history to a CSV file. (Other tools with this functionality for iOS I have found so far ask for money)
 
