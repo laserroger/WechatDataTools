@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     51995,       1366]
-NotebookOptionsPosition[     50198,       1299]
-NotebookOutlinePosition[     50556,       1315]
-CellTagsIndexPosition[     50513,       1312]
+NotebookDataLength[     71519,       1901]
+NotebookOptionsPosition[     67459,       1790]
+NotebookOutlinePosition[     67813,       1806]
+CellTagsIndexPosition[     67770,       1803]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -25,12 +25,19 @@ Cell["Wechat Chat History Tools", "Section",
   3.695136820064152*^9, 3.69513682867754*^9}}],
 
 Cell["\<\
+Version 2.1:
+2017-6-23
+Added message sender individual counts.
+Reorganized the notebook.
 Version 2:
 Database format based on the newest version as of 2016 Dec
 If you receive lots of errors, it is likely that the database format has \
 changed again, since this has happened before.\
 \>", "Text",
- CellChangeTimes->{{3.695136978072743*^9, 3.695137047175165*^9}}],
+ CellChangeTimes->{{3.695136978072743*^9, 3.695137047175165*^9}, {
+  3.707190944482356*^9, 
+  3.707191015469468*^9}},ExpressionUUID->"4e08a831-78c9-4605-86ee-\
+ccc52aa0af0e"],
 
 Cell["\<\
 User manual: evaluate all cells in the given order, change the information \
@@ -42,59 +49,116 @@ specified. You can ignore the comments in code.\
 Cell[CellGroupData[{
 
 Cell["Initialization code", "Subsection",
- CellChangeTimes->{{3.6951377429425898`*^9, 3.695137748113785*^9}}],
-
-Cell[BoxData[
- RowBox[{
-  RowBox[{"(*", 
-   RowBox[{
-    RowBox[{
-     RowBox[{"don", "'"}], "t", " ", "forget", " ", "to", " ", "evaluate", 
-     " ", "this", " ", "line"}], ",", " ", 
-    RowBox[{
-    "I", " ", "will", " ", "not", " ", "set", " ", "an", " ", 
-     "initialization", " ", "cell", " ", "to", " ", "confuse", " ", "you"}]}],
-    "*)"}], "\[IndentingNewLine]", 
-  RowBox[{
-   RowBox[{"Needs", "[", "\"\<DatabaseLink`\>\"", "]"}], ";"}]}]], "Input",
- CellChangeTimes->{{3.695141687633045*^9, 3.695141722793374*^9}}],
-
-Cell[TextData[StyleBox["Change the following paths to the two sqlite files \
-according to README",
- FontColor->RGBColor[1, 0, 0]]], "Text",
- CellChangeTimes->{{3.6951371996403522`*^9, 3.695137228484659*^9}, {
-  3.69513967459028*^9, 3.695139675944203*^9}}],
+ CellChangeTimes->{{3.6951377429425898`*^9, 
+  3.695137748113785*^9}},ExpressionUUID->"621b03b7-8eff-418a-bf96-\
+568020b65cd9"],
 
 Cell[BoxData[{
  RowBox[{
-  RowBox[{
-  "mmPath", "=", 
-   "\"\</Users/ywz/Desktop/desktop-old/App - \
-com.tencent.xin/Documents/d3a6a48811066d9529906f3cee6cf8ca/DB/MM.sqlite\>\""}]\
-, ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-  "contactPath", "=", 
-   "\"\</Users/ywz/Desktop/desktop-old/App - \
-com.tencent.xin/Documents/d3a6a48811066d9529906f3cee6cf8ca/DB/WCDB_Contact.\
-sqlite\>\""}], ";"}], "\n", 
- RowBox[{
-  RowBox[{"mmConn", "=", 
-   RowBox[{"OpenSQLConnection", "[", 
-    RowBox[{"JDBC", "[", 
-     RowBox[{"\"\<SQLite\>\"", ",", "mmPath"}], "]"}], "]"}]}], 
+  RowBox[{"Needs", "[", "\"\<DatabaseLink`\>\"", "]"}], 
   ";"}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"contConn", "=", 
-   RowBox[{"OpenSQLConnection", "[", 
-    RowBox[{"JDBC", "[", 
-     RowBox[{"\"\<SQLite\>\"", ",", "contactPath"}], "]"}], "]"}]}], 
-  ";"}], "\n", 
- RowBox[{
   RowBox[{
-   RowBox[{"rawcontact", "=", 
-    RowBox[{"SQLSelect", "[", 
-     RowBox[{"contConn", ",", "\"\<Friend\>\""}], "]"}]}], ";"}], "\n", 
+   RowBox[{"loadWechatDatabase", "[", 
+    RowBox[{"mmpath_", ",", "contpath_"}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "}"}], ",", "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{
+       RowBox[{
+       "I", " ", "did", " ", "not", " ", "block", " ", "any", " ", 
+        "symbols"}], ",", " ", 
+       RowBox[{
+       "they", " ", "can", " ", "be", " ", "used", " ", "after", " ", 
+        "words"}]}], "*)"}], "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"mmConn", "=", 
+       RowBox[{"OpenSQLConnection", "[", 
+        RowBox[{"JDBC", "[", 
+         RowBox[{"\"\<SQLite\>\"", ",", "mmpath"}], "]"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"contConn", "=", 
+       RowBox[{"OpenSQLConnection", "[", 
+        RowBox[{"JDBC", "[", 
+         RowBox[{"\"\<SQLite\>\"", ",", "contpath"}], "]"}], "]"}]}], ";", 
+      RowBox[{"rawcontact", "=", 
+       RowBox[{"SQLSelect", "[", 
+        RowBox[{"contConn", ",", "\"\<Friend\>\""}], "]"}]}], ";", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"01", " ", "is", " ", "male"}], ",", " ", 
+        RowBox[{"02", " ", "is", " ", "female"}], ",", " ", 
+        RowBox[{"00", " ", "is", " ", "unknown"}]}], "*)"}], 
+      "\[IndentingNewLine]", 
+      RowBox[{"contact", "=", 
+       RowBox[{
+        RowBox[{"readContact", "/@", 
+         RowBox[{"rawcontact", "[", 
+          RowBox[{"[", 
+           RowBox[{"All", ",", 
+            RowBox[{"{", 
+             RowBox[{"1", ",", "8", ",", "10"}], "}"}]}], "]"}], "]"}]}], "//",
+         "Quiet"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"chatID", "=", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"\"\<Chat_\>\"", "<>", 
+          RowBox[{"IntegerString", "[", 
+           RowBox[{
+            RowBox[{"Hash", "[", 
+             RowBox[{"#", ",", "\"\<MD5\>\""}], "]"}], ",", "16", ",", "32"}],
+            "]"}]}], "&"}], "/@", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"Transpose", "[", "contact", "]"}], ")"}], "[", 
+         RowBox[{"[", "1", "]"}], "]"}]}]}], ";", 
+      RowBox[{"getInfo", "=", 
+       RowBox[{"AssociationThread", "[", 
+        RowBox[{"chatID", ",", "contact"}], "]"}]}], ";", 
+      RowBox[{"availChatID", "=", 
+       RowBox[{"Select", "[", 
+        RowBox[{
+         RowBox[{"SQLTableNames", "[", "mmConn", "]"}], ",", 
+         RowBox[{
+          RowBox[{"StringContainsQ", "[", 
+           RowBox[{"#", ",", "\"\<Chat_\>\""}], "]"}], "&"}]}], "]"}]}], ";", 
+      
+      RowBox[{"availUserInfo", "=", 
+       RowBox[{"Lookup", "[", 
+        RowBox[{"getInfo", ",", "availChatID"}], "]"}]}], ";", 
+      RowBox[{"chatData", "=", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"SQLSelect", "[", 
+            RowBox[{"mmConn", ",", "#"}], "]"}], "&"}], "/@", "availChatID"}],
+          ")"}], "[", 
+        RowBox[{"[", 
+         RowBox[{"All", ",", "All", ",", 
+          RowBox[{"{", 
+           RowBox[{"4", ",", "5", ",", "9"}], "}"}]}], "]"}], "]"}]}], ";", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"since", " ", "order", " ", "is", " ", "preserved"}], ",", 
+        " ", 
+        RowBox[{
+        "any", " ", "other", " ", "info", " ", "than", " ", "time", " ", "is",
+          " ", "useless", " ", "for", " ", "counting"}], ",", " ", 
+        RowBox[{"improves", " ", "performance"}]}], "*)"}], 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"but", " ", "to", " ", "analysis", " ", "contents"}], ",", 
+        " ", 
+        RowBox[{
+        "use", " ", "full", " ", "database", " ", "chatData", " ", 
+         "instead"}]}], "*)"}], 
+      RowBox[{"chatTimeStamps", "=", 
+       RowBox[{"chatData", "[", 
+        RowBox[{"[", 
+         RowBox[{"All", ",", "All", ",", "1"}], "]"}], "]"}]}], ";"}]}], 
+    "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", 
   RowBox[{"(*", 
    RowBox[{
    "the", " ", "function", " ", "does", " ", "not", " ", "handle", " ", 
@@ -156,68 +220,6 @@ sqlite\>\""}], ";"}], "\n",
   
   RowBox[{"(*", 
    RowBox[{
-    RowBox[{"01", " ", "is", " ", "male"}], ",", " ", 
-    RowBox[{"02", " ", "is", " ", "female"}], ",", " ", 
-    RowBox[{"00", " ", "is", " ", "unknown"}]}], 
-   "*)"}]}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"contact", "=", 
-   RowBox[{
-    RowBox[{"readContact", "/@", 
-     RowBox[{"rawcontact", "[", 
-      RowBox[{"[", 
-       RowBox[{"All", ",", 
-        RowBox[{"{", 
-         RowBox[{"1", ",", "8", ",", "10"}], "}"}]}], "]"}], "]"}]}], "//", 
-    "Quiet"}]}], ";"}], "\n", 
- RowBox[{
-  RowBox[{"chatID", "=", 
-   RowBox[{
-    RowBox[{
-     RowBox[{"\"\<Chat_\>\"", "<>", 
-      RowBox[{"IntegerString", "[", 
-       RowBox[{
-        RowBox[{"Hash", "[", 
-         RowBox[{"#", ",", "\"\<MD5\>\""}], "]"}], ",", "16", ",", "32"}], 
-       "]"}]}], "&"}], "/@", 
-    RowBox[{
-     RowBox[{"(", 
-      RowBox[{"Transpose", "[", "contact", "]"}], ")"}], "[", 
-     RowBox[{"[", "1", "]"}], "]"}]}]}], ";"}], "\n", 
- RowBox[{
-  RowBox[{"getInfo", "=", 
-   RowBox[{"AssociationThread", "[", 
-    RowBox[{"chatID", ",", "contact"}], "]"}]}], ";"}], "\n", 
- RowBox[{
-  RowBox[{"availChatID", "=", 
-   RowBox[{"Select", "[", 
-    RowBox[{
-     RowBox[{"SQLTableNames", "[", "mmConn", "]"}], ",", 
-     RowBox[{
-      RowBox[{"StringContainsQ", "[", 
-       RowBox[{"#", ",", "\"\<Chat_\>\""}], "]"}], "&"}]}], "]"}]}], 
-  ";"}], "\n", 
- RowBox[{
-  RowBox[{"availUserInfo", "=", 
-   RowBox[{"Lookup", "[", 
-    RowBox[{"getInfo", ",", "availChatID"}], "]"}]}], ";"}], "\n", 
- RowBox[{
-  RowBox[{
-   RowBox[{"chatData", "=", 
-    RowBox[{
-     RowBox[{"(", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"SQLSelect", "[", 
-         RowBox[{"mmConn", ",", "#"}], "]"}], "&"}], "/@", "availChatID"}], 
-      ")"}], "[", 
-     RowBox[{"[", 
-      RowBox[{"All", ",", "All", ",", 
-       RowBox[{"{", 
-        RowBox[{"4", ",", "5", ",", "9"}], "}"}]}], "]"}], "]"}]}], ";"}], 
-  "\n", 
-  RowBox[{"(*", 
-   RowBox[{
     RowBox[{
      RowBox[{
      "the", " ", "time", " ", "stamp", " ", "is", " ", "the", " ", "second", 
@@ -225,59 +227,39 @@ sqlite\>\""}], ";"}], "\n",
      RowBox[{"1", " ", "8"}]}], ":", 
     RowBox[{"00", "AM", " ", 
      RowBox[{"(", 
-      RowBox[{"GMT", "+", "8"}], ")"}]}]}], "*)"}], "\[IndentingNewLine]", 
+      RowBox[{"GMT", "+", "8"}], ")"}]}]}], "*)"}], "\n", 
   RowBox[{"(*", 
    RowBox[{
     RowBox[{"convert", " ", "time", " ", "to", " ", "date", " ", "string"}], 
     ",", " ", 
-    RowBox[{"for", " ", "output"}]}], "*)"}]}], "\n", 
+    RowBox[{"for", " ", "output"}]}], "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
    RowBox[{"toDateString", "=", 
     RowBox[{
      RowBox[{"DateString", "@", 
       RowBox[{"AbsoluteTime", "[", 
-       RowBox[{"2209017600", "+", "#"}], "]"}]}], "&"}]}], ";"}], 
-  "\[IndentingNewLine]", 
+       RowBox[{"2209017600", "+", "#"}], "]"}]}], "&"}]}], ";"}], "\n", 
   RowBox[{"(*", 
    RowBox[{
     RowBox[{
     "convert", " ", "date", " ", "string", " ", "to", " ", "internal", " ", 
      "time"}], ",", " ", 
-    RowBox[{"for", " ", "selection"}]}], "*)"}]}], "\n", 
+    RowBox[{"for", " ", "selection"}]}], "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
    RowBox[{"toInternalTime", "=", 
     RowBox[{
      RowBox[{
       RowBox[{"AbsoluteTime", "[", "#", "]"}], "-", "2209017600"}], "&"}]}], 
-   ";"}], "\n", 
-  RowBox[{"(*", 
-   RowBox[{
-    RowBox[{"since", " ", "order", " ", "is", " ", "preserved"}], ",", " ", 
-    RowBox[{
-    "any", " ", "other", " ", "info", " ", "than", " ", "time", " ", "is", 
-     " ", "useless", " ", "for", " ", "counting"}], ",", " ", 
-    RowBox[{"improves", " ", "performance"}]}], "*)"}], "\[IndentingNewLine]", 
-  RowBox[{"(*", 
-   RowBox[{
-    RowBox[{"but", " ", "to", " ", "analysis", " ", "contents"}], ",", " ", 
-    RowBox[{
-    "use", " ", "full", " ", "database", " ", "chatData", " ", "instead"}]}], 
-   "*)"}]}], "\n", 
- RowBox[{
-  RowBox[{
-   RowBox[{"chatTimeStamps", "=", 
-    RowBox[{"chatData", "[", 
-     RowBox[{"[", 
-      RowBox[{"All", ",", "All", ",", "1"}], "]"}], "]"}]}], ";"}], "\n", 
+   ";"}], "\[IndentingNewLine]", 
   RowBox[{"(*", 
    RowBox[{"all", " ", "message", " ", "counts"}], 
    "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
    RowBox[{
-    RowBox[{"topAllChats", "[", "anydb_", "]"}], ":=", 
+    RowBox[{"topAllChatCounts", "[", "anydb_", "]"}], ":=", 
     RowBox[{
      RowBox[{
       RowBox[{"Transpose", "[", 
@@ -295,33 +277,71 @@ sqlite\>\""}], ";"}], "\n",
  RowBox[{
   RowBox[{
    RowBox[{
-    RowBox[{"topAllChatsNoGroup", "[", "anydb_", "]"}], ":=", 
-    RowBox[{
-     RowBox[{"(", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"Transpose", "[", 
-         RowBox[{"{", 
-          RowBox[{
-           RowBox[{"Length", "/@", "anydb"}], ",", "availUserInfo"}], "}"}], 
-         "]"}], "//", "Sort"}], "//", "Reverse"}], ")"}], "/.", 
+    RowBox[{"noGroups", "[", "countRes_", "]"}], ":=", 
+    RowBox[{"countRes", "/.", 
      RowBox[{
       RowBox[{"{", 
-       RowBox[{"_", ",", 
+       RowBox[{"__", ",", 
         RowBox[{"{", 
          RowBox[{
           RowBox[{"_", "?", 
            RowBox[{"(", 
             RowBox[{
-             RowBox[{"StringMatchQ", "[", 
-              RowBox[{"#", ",", 
-               RowBox[{
-                RowBox[{"(", 
-                 RowBox[{"__", "~~", "\"\<@chatroom\>\""}], ")"}], "|", 
-                RowBox[{"(", 
-                 RowBox[{"\"\<gh_\>\"", "~~", "__"}], ")"}]}]}], "]"}], "&"}],
-             ")"}]}], ",", "__"}], "}"}]}], "}"}], "\[RuleDelayed]", 
+             RowBox[{
+              RowBox[{"StringQ", "[", "#", "]"}], "&&", 
+              RowBox[{"StringMatchQ", "[", 
+               RowBox[{"#", ",", 
+                RowBox[{
+                 RowBox[{"(", 
+                  RowBox[{"__", "~~", "\"\<@chatroom\>\""}], ")"}], "|", 
+                 RowBox[{"(", 
+                  RowBox[{"\"\<gh_\>\"", "~~", "__"}], ")"}]}]}], "]"}]}], 
+             "&"}], ")"}]}], ",", "__"}], "}"}]}], "}"}], "\[RuleDelayed]", 
       "Nothing"}]}]}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"2.1", " ", 
+    RowBox[{"new", ":", " ", 
+     RowBox[{
+     "displays", " ", "count", " ", "of", " ", "message", " ", "sent", " ", 
+      "by", " ", "user", " ", "and", " ", "others", " ", "in", " ", "a", " ", 
+      "chat"}]}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"0", " ", "represents", " ", "the", " ", "user"}], ",", " ", 
+    RowBox[{"and", " ", "1", " ", "presents", " ", "other", 
+     RowBox[{"(", "s", ")"}], 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"this", " ", "'"}], 
+       RowBox[{"s", "'"}], " ", "refers", " ", "to", " ", "a", " ", "group", 
+       " ", "chat"}], ")"}], " ", "in", " ", "a", " ", "chat"}]}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+    "unlike", " ", "the", " ", "previous", " ", "count", " ", "functions"}], 
+    ",", " ", 
+    RowBox[{
+    "this", " ", "functions", " ", "must", " ", "take", " ", "the", " ", 
+     "full", " ", "chat", " ", "variable", " ", "as", " ", "the", " ", 
+     "argument"}]}], "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"topAllChatIndividualCounts", "[", "fulldb_", "]"}], ":=", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Transpose", "[", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"Length", "/@", "fulldb"}], ",", 
+         RowBox[{"Tally", "/@", 
+          RowBox[{"fulldb", "[", 
+           RowBox[{"[", 
+            RowBox[{"All", ",", "All", ",", 
+             RowBox[{"-", "1"}]}], "]"}], "]"}]}], ",", "availUserInfo"}], 
+        "}"}], "]"}], "//", "Sort"}], "//", "Reverse"}]}], ";"}], 
+  "\[IndentingNewLine]", 
   RowBox[{"(*", 
    RowBox[{
    "performs", " ", "counting", " ", "over", " ", "a", " ", "specific", " ", 
@@ -512,10 +532,48 @@ sqlite\>\""}], ";"}], "\n",
               RowBox[{"{", 
                RowBox[{"All", ",", "All", ",", "1"}], "}"}]}], "]"}]}], "}"}],
            "]"}]}], ")"}]}]}], "]"}], "//", "AbsoluteTiming"}]}], 
-  ";"}], "\[IndentingNewLine]"}], "Input",
+  ";"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.70719076926757*^9, 3.7071907922422953`*^9}, {
+   3.707190835836342*^9, 3.707190836098971*^9}, 3.7071908899962807`*^9, {
+   3.7071914034771852`*^9, 3.707191415909992*^9}, {3.707191707435927*^9, 
+   3.707191713044466*^9}, {3.707191783196278*^9, 3.707191783857798*^9}},
+ CellLabel->"In[2]:=",ExpressionUUID->"e3631668-d57d-4c2f-ab28-48ab1b883b58"],
+
+Cell[TextData[StyleBox["Change the following paths to the two sqlite files \
+according to README",
+ FontColor->RGBColor[1, 0, 0]]], "Text",
+ CellChangeTimes->{{3.6951371996403522`*^9, 3.695137228484659*^9}, {
+  3.69513967459028*^9, 3.695139675944203*^9}, {3.7071908988721943`*^9, 
+  3.707190900238657*^9}},ExpressionUUID->"c87a5c82-b1c0-461d-af71-\
+4dbcf38a58a6"],
+
+Cell["Run the following code to preprocess the chat database", "Text",
+ CellChangeTimes->{{3.707190906611075*^9, 3.7071909279724007`*^9}},
+ CellID->665306374,ExpressionUUID->"300e572b-20c1-4e4e-bc28-30cc0997b916"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+  "mmPath", "=", 
+   "\"\</Users/vaporized/Desktop/wechat_backups/2017623_full/DB/MM.sqlite\>\"\
+"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+  "contactPath", "=", 
+   "\"\</Users/vaporized/Desktop/wechat_backups/2017623_full/DB/WCDB_Contact.\
+sqlite\>\""}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"loadWechatDatabase", "[", 
+   RowBox[{"mmPath", ",", "contactPath"}], "]"}], ";"}]}], "Input",
  CellChangeTimes->{{3.694869150161687*^9, 3.6948691553771763`*^9}, {
    3.694869281764926*^9, 3.694869336917783*^9}, {3.694869389796958*^9, 
-   3.6948693994104013`*^9}, 3.695141746255883*^9}]
+   3.6948693994104013`*^9}, {3.707188090715621*^9, 3.70718809529806*^9}, 
+   3.707190705971636*^9, {3.7071907664266644`*^9, 3.7071907958809032`*^9}, 
+   3.707190832090664*^9, {3.707191235052765*^9, 3.707191437976952*^9}, {
+   3.707191715004607*^9, 3.7071917157079973`*^9}, {3.70719178000984*^9, 
+   3.7071917903738213`*^9}},
+ CellLabel->"In[17]:=",ExpressionUUID->"d50c5fa1-8e61-4148-9975-06c30922aaeb"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -536,7 +594,7 @@ Cell[BoxData[
    RowBox[{
     RowBox[{"top20All", "=", 
      RowBox[{
-      RowBox[{"topAllChats", "[", "chatTimeStamps", "]"}], "//", 
+      RowBox[{"topAllChatCounts", "[", "chatTimeStamps", "]"}], "//", 
       RowBox[{
        RowBox[{"Take", "[", 
         RowBox[{"#", ",", 
@@ -555,21 +613,247 @@ Cell[BoxData[
     RowBox[{"[", 
      RowBox[{"All", ",", "1"}], "]"}], "]"}]}]}]], "Input",
  CellChangeTimes->{{3.695129624670095*^9, 3.695129722398445*^9}, {
-  3.695130797515345*^9, 3.695130839513812*^9}, {3.695137350915553*^9, 
-  3.695137371671303*^9}, {3.695137628723757*^9, 3.69513768392915*^9}, {
-  3.695137716921036*^9, 3.695137720586398*^9}, {3.695137798623498*^9, 
-  3.69513783271628*^9}}],
+   3.695130797515345*^9, 3.695130839513812*^9}, {3.695137350915553*^9, 
+   3.695137371671303*^9}, {3.695137628723757*^9, 3.69513768392915*^9}, {
+   3.695137716921036*^9, 3.695137720586398*^9}, {3.695137798623498*^9, 
+   3.69513783271628*^9}, 3.707188106633058*^9, {3.707189604077087*^9, 
+   3.7071896049967947`*^9}, {3.707190274925593*^9, 3.707190276707181*^9}, 
+   3.707190592330276*^9, {3.70719181069652*^9, 3.7071918123984222`*^9}, {
+   3.707191842971796*^9, 3.707191845373104*^9}},
+ CellLabel->"In[22]:=",ExpressionUUID->"bf0b41aa-e669-4f28-87c4-196388c9f984"],
 
 Cell[BoxData[
  RowBox[{"{", 
   RowBox[{
-  "69321", ",", "28993", ",", "27602", ",", "24325", ",", "19306", ",", 
-   "18702", ",", "16936", ",", "16725", ",", "15547", ",", "13466", ",", 
-   "13341", ",", "11191", ",", "10958", ",", "10687", ",", "10084", ",", 
-   "7974", ",", "7915", ",", "5885", ",", "5634", ",", "5459"}], 
+  "87023", ",", "43647", ",", "35583", ",", "35516", ",", "27605", ",", 
+   "25679", ",", "23447", ",", "19385", ",", "18863", ",", "18822", ",", 
+   "18792", ",", "13894", ",", "13805", ",", "11480", ",", "10004", ",", 
+   "7870", ",", "7071", ",", "6733", ",", "5628", ",", "5147"}], 
   "}"}]], "Output",
- CellChangeTimes->{3.695129630730577*^9, 3.695129688106657*^9, 
-  3.6951297230242233`*^9, 3.695130840358824*^9, 3.6951376844081583`*^9}]
+ CellChangeTimes->{
+  3.695129630730577*^9, 3.695129688106657*^9, 3.6951297230242233`*^9, 
+   3.695130840358824*^9, 3.6951376844081583`*^9, 3.707188109998777*^9, {
+   3.707189010875154*^9, 3.7071890249514027`*^9}, 3.7071896072920427`*^9, 
+   3.7071902771005697`*^9, 3.7071905931514063`*^9, 3.70719180856164*^9, 
+   3.7071918485108*^9},
+ CellLabel->"Out[23]=",
+ CellID->479160567,ExpressionUUID->"4aa8d903-9347-417c-83be-f17fe3136ece"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"include", " ", "groups", " ", "and", " ", "subscriptions"}], ",",
+     " ", 
+    RowBox[{"first", " ", "20"}], ",", " ", 
+    RowBox[{"with", " ", "individual", " ", "message", " ", "counts"}]}], 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"0", " ", "represents", " ", "the", " ", "user"}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"top20AllVerbose", "=", 
+     RowBox[{
+      RowBox[{"topAllChatIndividualCounts", "[", "chatData", "]"}], "//", 
+      RowBox[{
+       RowBox[{"Take", "[", 
+        RowBox[{"#", ",", 
+         RowBox[{"UpTo", "[", "20", "]"}]}], "]"}], "&"}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"for", " ", "privacy", " ", "reasons"}], ",", " ", 
+     RowBox[{
+     "only", " ", "message", " ", "counts", " ", "are", " ", "displayed", " ",
+       "as", " ", "a", " ", "public", " ", 
+      RowBox[{"example", ".", " ", "But"}], " ", "the", " ", "variable", " ", 
+      "top20All", " ", "will", " ", "contain", " ", "all", " ", "infomation", 
+      " ", "in", " ", "your", " ", "run"}]}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"top20AllVerbose", "[", 
+    RowBox[{"[", 
+     RowBox[{"All", ",", 
+      RowBox[{"{", 
+       RowBox[{"1", ",", "2"}], "}"}]}], "]"}], "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.7071896551387243`*^9, 3.707189706172287*^9}, {
+   3.707190279879333*^9, 3.70719028164219*^9}, {3.70719031440414*^9, 
+   3.7071903153529177`*^9}, 3.707190606177649*^9, {3.707191851561977*^9, 
+   3.7071918591958647`*^9}},
+ CellLabel->"In[24]:=",
+ CellID->1695817538,ExpressionUUID->"dcd6b3bb-4896-46f6-96af-5d12d44b9d70"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"87023", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "53758"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "33265"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"43647", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "24031"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "19616"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"35583", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "18119"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "17464"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"35516", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "15568"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "19948"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"27605", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "26797"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "808"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"25679", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "12091"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "13588"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"23447", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"0", ",", "13182"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "10265"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"19385", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "8981"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "10404"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"18863", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "10005"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "8858"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"18822", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "18761"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "61"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"18792", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"0", ",", "7835"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "10957"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"13894", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "8919"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "4975"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"13805", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "7982"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "5823"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"11480", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "6216"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "5264"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"10004", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "9973"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "31"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"7870", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"0", ",", "4266"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "3604"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"7071", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "5332"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "1739"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"6733", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "3519"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "3214"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"5628", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "5033"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "595"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"5147", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "4133"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "1014"}], "}"}]}], "}"}]}], "}"}]}], 
+  "}"}]], "Output",
+ CellChangeTimes->{{3.707189683046694*^9, 3.7071896895007267`*^9}, 
+   3.707190282037189*^9, 3.707190315878634*^9, 3.707190607136405*^9, 
+   3.7071918596856117`*^9},
+ CellLabel->"Out[25]=",
+ CellID->1922134355,ExpressionUUID->"55aefe11-b8e6-4e56-8634-b0a8e93f9006"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -585,7 +869,8 @@ Cell[BoxData[
    RowBox[{
     RowBox[{"top20", "=", 
      RowBox[{
-      RowBox[{"topAllChatsNoGroup", "[", "chatTimeStamps", "]"}], "//", 
+      RowBox[{"noGroups", "@", 
+       RowBox[{"topAllChatCounts", "[", "chatTimeStamps", "]"}]}], "//", 
       RowBox[{
        RowBox[{"Take", "[", 
         RowBox[{"#", ",", 
@@ -604,19 +889,25 @@ Cell[BoxData[
    3.695131401546733*^9}, {3.695131471551511*^9, 3.695131518423498*^9}, {
    3.6951315526410646`*^9, 3.695131554434309*^9}, 3.695137382256225*^9, {
    3.695137689332375*^9, 3.695137702206996*^9}, {3.695137785481742*^9, 
-   3.69513779356737*^9}, {3.695138133341999*^9, 3.695138148485141*^9}}],
+   3.69513779356737*^9}, {3.695138133341999*^9, 3.695138148485141*^9}, 
+   3.707188144354851*^9, {3.707189614118626*^9, 3.707189644908762*^9}, {
+   3.707190289819253*^9, 3.7071902914616203`*^9}},
+ CellLabel->"In[26]:=",ExpressionUUID->"87be7e43-ac51-4c45-b742-b91355f9a79e"],
 
 Cell[BoxData[
  RowBox[{"{", 
   RowBox[{
-  "24325", ",", "19306", ",", "16936", ",", "16725", ",", "13466", ",", 
-   "11191", ",", "10687", ",", "7974", ",", "5459", ",", "3915", ",", "3459", 
-   ",", "2468", ",", "2317", ",", "1983", ",", "1856", ",", "1556", ",", 
-   "1485", ",", "1214", ",", "1196", ",", "1173"}], "}"}]], "Output",
+  "43647", ",", "35583", ",", "35516", ",", "25679", ",", "23447", ",", 
+   "19385", ",", "18863", ",", "13805", ",", "11480", ",", "6733", ",", 
+   "4228", ",", "3557", ",", "3169", ",", "2970", ",", "2558", ",", "2124", 
+   ",", "2073", ",", "1859", ",", "1680", ",", "1516"}], "}"}]], "Output",
  CellChangeTimes->{
   3.695129875378829*^9, 3.695130066939149*^9, 3.695130908750149*^9, 
    3.695131402011862*^9, {3.6951315404975348`*^9, 3.6951315549802227`*^9}, 
-   3.695137702857897*^9}]
+   3.695137702857897*^9, 3.707188144807519*^9, 3.707189619429819*^9, 
+   3.707190291860714*^9, 3.707190609916678*^9, 3.707191864070053*^9},
+ CellLabel->"Out[27]=",
+ CellID->1314082559,ExpressionUUID->"60b1dbed-c2a7-4049-af5c-82aa64ae7dc1"]
 }, Open  ]]
 }, Open  ]],
 
@@ -638,7 +929,9 @@ Cell[BoxData[
     RowBox[{"randomDateRange", "[", "chatTimeStamps", "]"}]}], 
    ";"}]}]], "Input",
  CellChangeTimes->{{3.695131261729385*^9, 3.6951313097073936`*^9}, {
-  3.695137887351881*^9, 3.6951379017321453`*^9}}],
+  3.695137887351881*^9, 3.6951379017321453`*^9}},
+ CellLabel->
+  "In[121]:=",ExpressionUUID->"c14db001-879e-457c-b5fb-dfeb5ae8f62f"],
 
 Cell[CellGroupData[{
 
@@ -667,7 +960,8 @@ Cell[BoxData[
    RowBox[{"DateObject", "[", "\"\<2016-08-17\>\"", "]"}]}]}]], "Input",
  CellChangeTimes->{{3.695137918488144*^9, 3.6951379812181177`*^9}, {
   3.695138017031464*^9, 3.6951380171753798`*^9}, {3.695138066364463*^9, 
-  3.695138092593885*^9}}],
+  3.695138092593885*^9}},ExpressionUUID->"d8f99686-e904-493e-9789-\
+f84d79c9e255"],
 
 Cell[BoxData[
  TemplateBox[{RowBox[{"\"Wed 17 Aug 2016\""}],RowBox[{"DateObject", "[", 
@@ -675,47 +969,240 @@ Cell[BoxData[
        RowBox[{"2016", ",", "8", ",", "17"}], "}"}], "]"}]},
   "DateObject",
   Editable->False]], "Output",
- CellChangeTimes->{3.695138085520974*^9}]
+ CellChangeTimes->{
+  3.695138085520974*^9},ExpressionUUID->"432c1a54-f8e5-4c82-abe7-\
+687157da45a0"]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
-Cell[BoxData[{
+Cell[BoxData[
  RowBox[{
-  RowBox[{"partialChatTimeStamp", "=", 
-   RowBox[{"takeTimeStampRange", "[", 
-    RowBox[{"chatTimeStamps", ",", "date1", ",", "date2"}], "]"}]}], 
-  ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-   RowBox[{"top20partial", "=", 
-    RowBox[{
-     RowBox[{"topAllChatsNoGroup", "[", "partialChatTimeStamp", "]"}], "//", 
-     RowBox[{
-      RowBox[{"Take", "[", 
-       RowBox[{"#", ",", 
-        RowBox[{"UpTo", "[", "20", "]"}]}], "]"}], "&"}]}]}], ";"}], 
-  "\[IndentingNewLine]", 
   RowBox[{"(*", 
-   RowBox[{"message", " ", "counts", " ", "only"}], 
-   "*)"}]}], "\[IndentingNewLine]", 
- RowBox[{"top20partial", "[", 
-  RowBox[{"[", 
-   RowBox[{"All", ",", "1"}], "]"}], "]"}]}], "Input",
+   RowBox[{
+    RowBox[{"specify", " ", "a", " ", "date"}], ",", " ", 
+    RowBox[{"to", " ", "today"}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"partialChatTimeStamp", "=", 
+     RowBox[{"takeTimeStampRange", "[", 
+      RowBox[{"chatTimeStamps", ",", 
+       RowBox[{"DateObject", "[", "\"\<2017-04-01\>\"", "]"}], ",", "Today"}],
+       "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"top20partialts", "=", 
+     RowBox[{
+      RowBox[{"noGroups", "@", 
+       RowBox[{"topAllChatCounts", "[", "partialChatTimeStamp", "]"}]}], "//", 
+      RowBox[{
+       RowBox[{"Take", "[", 
+        RowBox[{"#", ",", 
+         RowBox[{"UpTo", "[", "20", "]"}]}], "]"}], "&"}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"individual", " ", "counts"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"partialChat", "=", 
+     RowBox[{"takeTimeRange", "[", 
+      RowBox[{"chatData", ",", 
+       RowBox[{"DateObject", "[", "\"\<2017-04-01\>\"", "]"}], ",", "Today"}],
+       "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"top20partial", "=", 
+     RowBox[{
+      RowBox[{"noGroups", "@", 
+       RowBox[{"topAllChatIndividualCounts", "[", "partialChat", "]"}]}], "//", 
+      RowBox[{
+       RowBox[{"Take", "[", 
+        RowBox[{"#", ",", 
+         RowBox[{"UpTo", "[", "20", "]"}]}], "]"}], "&"}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"top20partial", "[", 
+    RowBox[{"[", 
+     RowBox[{"All", ",", 
+      RowBox[{"{", 
+       RowBox[{"1", ",", "2"}], "}"}]}], "]"}], "]"}]}]}]], "Input",
  CellChangeTimes->{{3.695130776070773*^9, 3.695130781484911*^9}, {
    3.695130925300747*^9, 3.6951310134052773`*^9}, {3.6951313313928423`*^9, 
    3.695131336898121*^9}, {3.69513803393381*^9, 3.695138056404091*^9}, {
-   3.6951381187798653`*^9, 3.6951381208525267`*^9}, 3.695138154405555*^9}],
+   3.6951381187798653`*^9, 3.6951381208525267`*^9}, 3.695138154405555*^9, {
+   3.707189754590597*^9, 3.707189870399034*^9}, {3.7071899589313183`*^9, 
+   3.707189977587268*^9}, {3.707190016422923*^9, 3.70719006764784*^9}, {
+   3.707190298634446*^9, 3.707190308800064*^9}, {3.707190346080864*^9, 
+   3.707190383369957*^9}, 3.707190629547227*^9, {3.707191871226665*^9, 
+   3.7071918788897867`*^9}},
+ CellLabel->"In[33]:=",ExpressionUUID->"1ad33aa7-9466-4fa0-828b-000763a47643"],
 
 Cell[BoxData[
  RowBox[{"{", 
   RowBox[{
-  "9674", ",", "866", ",", "701", ",", "562", ",", "289", ",", "120", ",", 
-   "99", ",", "90", ",", "57", ",", "50", ",", "41", ",", "30", ",", "22", 
-   ",", "19", ",", "19", ",", "15", ",", "15", ",", "13", ",", "12", ",", 
-   "9"}], "}"}]], "Output",
- CellChangeTimes->{3.69513101394696*^9, 3.69513133907854*^9, 
-  3.695131407532571*^9, 3.6951315630500717`*^9, 3.6951380583416243`*^9}]
+   RowBox[{"{", 
+    RowBox[{"33664", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "17196"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "16468"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"4710", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2182"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "2528"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"3594", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"0", ",", "1944"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1650"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"1727", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1007"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "720"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"860", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"0", ",", "441"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "419"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"699", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "440"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "259"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"483", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "229"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "254"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"469", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"0", ",", "268"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "201"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"267", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "177"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "90"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"239", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "135"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "104"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"201", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "120"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "81"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"144", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "70"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "74"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"131", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "50"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "81"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"127", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "69"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "58"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"85", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "44"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "41"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"85", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "40"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "45"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"82", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "43"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "39"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"65", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "37"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "28"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"64", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "27"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "37"}], "}"}]}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"59", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "31"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "28"}], "}"}]}], "}"}]}], "}"}]}], "}"}]], "Output",\
+
+ CellChangeTimes->{
+  3.7071901962497253`*^9, 3.707190245533012*^9, {3.707190359871909*^9, 
+   3.707190384263833*^9}, {3.7071906270386353`*^9, 3.7071906306050987`*^9}, {
+   3.70719187388338*^9, 3.70719187978096*^9}},
+ CellLabel->"Out[37]=",
+ CellID->1770324310,ExpressionUUID->"2e8544d1-1d38-4fc2-b3ee-b2c2e13a701d"]
 }, Open  ]]
 }, Open  ]],
 
@@ -1287,20 +1774,24 @@ Cell[CellGroupData[{
 Cell[BoxData[
  RowBox[{"exportAllHistory", "[", "\"\<history.csv\>\"", "]"}]], "Input",
  CellChangeTimes->{{3.69513924679941*^9, 3.6951392548560123`*^9}, 
-   3.695139384252905*^9}],
+   3.695139384252905*^9},
+ CellLabel->"In[43]:=",ExpressionUUID->"6c210926-caf3-474f-baf4-5902e32843f1"],
 
 Cell[BoxData[
  RowBox[{"{", 
-  RowBox[{"106.129271`", ",", "\<\"history.csv\"\>"}], "}"}]], "Output",
- CellChangeTimes->{3.6951393637328987`*^9, 3.6951394912133293`*^9}]
+  RowBox[{"131.887584`", ",", "\<\"history.csv\"\>"}], "}"}]], "Output",
+ CellChangeTimes->{3.6951393637328987`*^9, 3.6951394912133293`*^9, 
+  3.707190770854744*^9},
+ CellLabel->"Out[43]=",
+ CellID->1823041649,ExpressionUUID->"4375b1fc-9fd3-40c7-a529-ca3479b101e0"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 },
 WindowSize->{1436, 855},
 WindowMargins->{{0, Automatic}, {Automatic, 0}},
-FrontEndVersion->"11.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (September \
-21, 2016)",
+FrontEndVersion->"11.1 for Mac OS X x86 (32-bit, 64-bit Kernel) (April 18, \
+2017)",
 StyleDefinitions->"Default.nb"
 ]
 (* End of Notebook Content *)
@@ -1315,56 +1806,100 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[CellGroupData[{
-Cell[580, 22, 160, 2, 95, "Section"],
-Cell[743, 26, 281, 6, 105, "Text"],
-Cell[1027, 34, 265, 5, 46, "Text"],
+Cell[580, 22, 160, 2, 96, "Section", "ExpressionUUID" -> \
+"f648408f-d168-4965-bae5-b6cf7f29c102"],
+Cell[743, 26, 479, 13, 224, "Text", "ExpressionUUID" -> \
+"4e08a831-78c9-4605-86ee-ccc52aa0af0e"],
+Cell[1225, 41, 265, 5, 47, "Text", "ExpressionUUID" -> \
+"e9867846-da8d-4f5f-bb9e-2bf6a6ca8092"],
 Cell[CellGroupData[{
-Cell[1317, 43, 109, 1, 65, "Subsection"],
-Cell[1429, 46, 529, 13, 80, "Input"],
-Cell[1961, 61, 255, 4, 46, "Text"],
-Cell[2219, 67, 15455, 450, 2035, "Input"]
+Cell[1515, 50, 169, 3, 65, "Subsection", "ExpressionUUID" -> \
+"621b03b7-8eff-418a-bf96-568020b65cd9"],
+Cell[1687, 55, 17521, 485, 2122, "Input", "ExpressionUUID" -> \
+"e3631668-d57d-4c2f-ab28-48ab1b883b58",
+ InitializationCell->True],
+Cell[19211, 542, 363, 6, 47, "Text", "ExpressionUUID" -> \
+"c87a5c82-b1c0-461d-af71-4dbcf38a58a6"],
+Cell[19577, 550, 213, 2, 47, "Text", "ExpressionUUID" -> \
+"300e572b-20c1-4e4e-bc28-30cc0997b916",
+ CellID->665306374],
+Cell[19793, 554, 981, 21, 112, "Input", "ExpressionUUID" -> \
+"d50c5fa1-8e61-4148-9975-06c30922aaeb"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[17711, 522, 105, 1, 65, "Subsection"],
+Cell[20811, 580, 105, 1, 65, "Subsection", "ExpressionUUID" -> \
+"7ad6d2e5-a0e2-4c03-8dc6-16158f4959aa"],
 Cell[CellGroupData[{
-Cell[17841, 527, 1394, 33, 173, "Input"],
-Cell[19238, 562, 483, 9, 80, "Output"]
+Cell[20941, 585, 1725, 37, 174, "Input", "ExpressionUUID" -> \
+"bf0b41aa-e669-4f28-87c4-196388c9f984"],
+Cell[22669, 624, 781, 15, 81, "Output", "ExpressionUUID" -> \
+"4aa8d903-9347-417c-83be-f17fe3136ece",
+ CellID->479160567]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[19758, 576, 1308, 30, 142, "Input"],
-Cell[21069, 608, 526, 10, 80, "Output"]
+Cell[23487, 644, 1709, 41, 205, "Input", "ExpressionUUID" -> \
+"dcd6b3bb-4896-46f6-96af-5d12d44b9d70",
+ CellID->1695817538],
+Cell[25199, 687, 5048, 168, 236, "Output", "ExpressionUUID" -> \
+"55aefe11-b8e6-4e56-8634-b0a8e93f9006",
+ CellID->1922134355]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[30284, 860, 1544, 34, 143, "Input", "ExpressionUUID" -> \
+"87be7e43-ac51-4c45-b742-b91355f9a79e"],
+Cell[31831, 896, 742, 13, 81, "Output", "ExpressionUUID" -> \
+"60b1dbed-c2a7-4049-af5c-82aa64ae7dc1",
+ CellID->1314082559]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[21644, 624, 127, 1, 65, "Subsection"],
-Cell[21774, 627, 457, 13, 80, "Input"],
+Cell[32622, 915, 127, 1, 65, "Subsection", "ExpressionUUID" -> \
+"a6318045-778a-40e7-b007-2b26b2aeb964"],
+Cell[32752, 918, 540, 15, 81, "Input", "ExpressionUUID" -> \
+"c14db001-879e-457c-b5fb-dfeb5ae8f62f"],
 Cell[CellGroupData[{
-Cell[22256, 644, 1012, 25, 111, "Input"],
-Cell[23271, 671, 256, 6, 61, "Output"]
+Cell[33317, 937, 1069, 26, 112, "Input", "ExpressionUUID" -> \
+"d8f99686-e904-493e-9789-f84d79c9e255"],
+Cell[34389, 965, 316, 8, 62, "Output", "ExpressionUUID" -> \
+"432c1a54-f8e5-4c82-abe7-687157da45a0"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[23564, 682, 1015, 25, 142, "Input"],
-Cell[24582, 709, 429, 8, 48, "Output"]
+Cell[34742, 978, 2323, 55, 236, "Input", "ExpressionUUID" -> \
+"1ad33aa7-9466-4fa0-828b-000763a47643"],
+Cell[37068, 1035, 5000, 169, 205, "Output", "ExpressionUUID" -> \
+"2e8544d1-1d38-4fc2-b3ee-b2c2e13a701d",
+ CellID->1770324310]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[25060, 723, 112, 1, 65, "Subsection"],
-Cell[25175, 726, 729, 18, 111, "Input"],
+Cell[42117, 1210, 112, 1, 65, "Subsection", "ExpressionUUID" -> \
+"d918fbdd-b958-42b4-9404-bf4707ba2491"],
+Cell[42232, 1213, 729, 18, 112, "Input", "ExpressionUUID" -> \
+"835ce086-2f7a-4e86-9e85-516dddd0b7de"],
 Cell[CellGroupData[{
-Cell[25929, 748, 1762, 40, 173, "Input"],
-Cell[27694, 790, 11690, 290, 364, "Output"]
+Cell[42986, 1235, 1762, 40, 174, "Input", "ExpressionUUID" -> \
+"055a8502-dfd6-4f0f-94e1-89013b67378b"],
+Cell[44751, 1277, 11690, 290, 365, "Output", "ExpressionUUID" -> \
+"4bff8605-b2fa-4caa-83aa-f52b15e82a76"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[39421, 1085, 668, 18, 80, "Input"],
-Cell[40092, 1105, 8816, 157, 349, "Output"]
+Cell[56478, 1572, 668, 18, 81, "Input", "ExpressionUUID" -> \
+"d09a8efb-eb64-445f-af8c-b8d6606266b8"],
+Cell[57149, 1592, 8816, 157, 350, "Output", "ExpressionUUID" -> \
+"c60c9f33-be26-4aa4-af37-d10f7479b118"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[48957, 1268, 118, 1, 65, "Subsection"],
-Cell[49078, 1271, 703, 11, 194, "Text"],
+Cell[66014, 1755, 118, 1, 65, "Subsection", "ExpressionUUID" -> \
+"e9f1df1e-c333-45d4-ad2a-08502e46db1c"],
+Cell[66135, 1758, 703, 11, 195, "Text", "ExpressionUUID" -> \
+"697d1954-c9e4-4a4a-a3dc-b1541a7f7c64"],
 Cell[CellGroupData[{
-Cell[49806, 1286, 180, 3, 48, "Input"],
-Cell[49989, 1291, 169, 3, 48, "Output"]
+Cell[66863, 1773, 259, 4, 49, "Input", "ExpressionUUID" -> \
+"6c210926-caf3-474f-baf4-5902e32843f1"],
+Cell[67125, 1779, 294, 6, 49, "Output", "ExpressionUUID" -> \
+"4375b1fc-9fd3-40c7-a529-ca3479b101e0",
+ CellID->1823041649]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
